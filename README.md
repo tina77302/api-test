@@ -1,8 +1,11 @@
 # FastAPI Full Stack
 
+상세 학습 노트: [WSL부터 FastAPI·Swagger·GitHub까지](docs/DEVELOPMENT_STACK_NOTES.md)
+
 ## 구조
 
 ```text
+main.py        FastAPI 실행 진입점
 backend/       FastAPI 백엔드
 frontend/      HTML, CSS, JavaScript 프론트엔드
 .env           로컬 API 키
@@ -13,7 +16,7 @@ frontend/      HTML, CSS, JavaScript 프론트엔드
 ```bash
 source .venv/bin/activate
 pip install -r backend/requirements.txt
-uvicorn backend.main:app --reload
+uvicorn main:app --reload
 ```
 
 서버 실행 후 아래 주소를 사용할 수 있습니다.
