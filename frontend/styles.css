@@ -261,6 +261,50 @@ thead { color: var(--muted); }
 .confidence-box > strong { display: block; margin: .3rem 0; color: var(--orange); }
 .confidence-box > strong.low { color: var(--red); }
 .confidence-box p { margin: 0; color: #bbaa8e; font-size: .72rem; line-height: 1.55; }
+.guide-intro {
+  max-width: 820px; margin: -.2rem 0 1.2rem; color: var(--muted);
+  font-size: .8rem; line-height: 1.65;
+}
+.variable-groups { display: grid; gap: .65rem; }
+.variable-groups details {
+  overflow: hidden; border: 1px solid var(--line); border-radius: .8rem;
+  background: var(--panel-2);
+}
+.variable-groups summary {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.1rem; cursor: pointer; list-style: none;
+}
+.variable-groups summary::-webkit-details-marker { display: none; }
+.variable-groups summary::after {
+  content: "+"; margin-left: auto; padding-left: 1rem;
+  color: var(--lime); font-size: 1.2rem;
+}
+.variable-groups details[open] summary::after { content: "−"; }
+.variable-groups summary span { font-size: .9rem; font-weight: 750; }
+.variable-groups summary small {
+  order: 2; margin-left: .8rem; color: var(--muted); font-size: .68rem;
+}
+.variable-table-wrap { overflow-x: auto; padding: 0 1rem 1rem; }
+.variable-table th, .variable-table td {
+  text-align: left; vertical-align: top; line-height: 1.55;
+}
+.variable-table tbody th { width: 22%; color: var(--ink); }
+.variable-table tbody td { color: var(--muted); font-size: .76rem; }
+.target-definition { padding: 0 1rem 1.2rem; }
+.target-definition code {
+  display: inline-block; border-radius: .45rem; padding: .6rem .8rem;
+  color: var(--lime); background: #090b0a;
+}
+.target-definition > div { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+.target-definition span { color: var(--muted); font-size: .76rem; }
+.target-definition i {
+  display: inline-block; width: .5rem; height: .5rem;
+  margin-right: .35rem; border-radius: 50%;
+}
+.target-definition i.cut { background: var(--blue); }
+.target-definition i.hold { background: var(--muted); }
+.target-definition i.hike { background: var(--red); }
+.target-definition p { margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.6; }
 .notice {
   display: grid; grid-template-columns: 220px 1fr; gap: 2rem;
   margin: 1rem 0 4rem; border: 1px solid #5a4424; border-radius: 1rem;

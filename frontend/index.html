@@ -251,6 +251,103 @@
         </article>
       </section>
 
+      <section class="panel variable-guide" id="variables">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">FEATURE DICTIONARY</p>
+            <h2>모델에는 어떤 변수를 넣었나요?</h2>
+          </div>
+          <span class="method-badge">입력 변수 19개 · 목표값 1개</span>
+        </div>
+        <p class="guide-intro">
+          현재 수치만 넣지 않고 최근 변화 속도와 지표 사이의 차이도 함께
+          입력했습니다. 아래 해석은 일반적인 경제적 방향이며, 항상 같은
+          금리 결정으로 이어진다는 의미는 아닙니다.
+        </p>
+
+        <div class="variable-groups">
+          <details open>
+            <summary>
+              <span>기본 경제지표</span>
+              <small>6개 변수</small>
+            </summary>
+            <div class="variable-table-wrap">
+              <table class="variable-table">
+                <thead>
+                  <tr><th>변수</th><th>의미</th><th>일반적 해석</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th>현재 기준금리</th><td>예측 시점의 한국은행 기준금리</td><td>향후 금리 수준을 결정하는 출발점</td></tr>
+                  <tr><th>물가상승률</th><td>소비자물가지수 전년 동월 대비 상승률</td><td>물가 압력이 높으면 인하가 어려울 수 있음</td></tr>
+                  <tr><th>원·달러 환율</th><td>월평균 원화의 달러 대비 환율</td><td>원화 약세가 심하면 인하 부담이 커질 수 있음</td></tr>
+                  <tr><th>실업률</th><td>월별 국내 실업률</td><td>고용 악화는 인하 필요성을 높일 수 있음</td></tr>
+                  <tr><th>국고채 3년물</th><td>시장 참여자의 중기 금리 기대가 반영된 채권금리</td><td>정책금리보다 먼저 움직이는 시장 신호로 활용</td></tr>
+                  <tr><th>미국 기준금리</th><td>미국 연방기금금리 월평균</td><td>한미 금리 차와 환율 여건을 통해 국내 결정에 영향</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span>최근 변화 변수</span>
+              <small>9개 변수</small>
+            </summary>
+            <div class="variable-table-wrap">
+              <table class="variable-table">
+                <thead>
+                  <tr><th>변수</th><th>계산법</th><th>알 수 있는 것</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th>물가 1·3·6개월 변화</th><td>현재 물가상승률 − 과거 물가상승률</td><td>물가가 가속하는지 둔화하는지 측정</td></tr>
+                  <tr><th>환율 1·3·6개월 변화율</th><td>(현재 환율 ÷ 과거 환율 − 1) × 100</td><td>원화 약세·강세의 속도를 측정</td></tr>
+                  <tr><th>국고채 1·3·6개월 변화</th><td>현재 3년물 금리 − 과거 3년물 금리</td><td>시장의 금리 기대가 어느 방향으로 변했는지 측정</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span>금리차와 최근 정책 방향</span>
+              <small>4개 변수</small>
+            </summary>
+            <div class="variable-table-wrap">
+              <table class="variable-table">
+                <thead>
+                  <tr><th>변수</th><th>계산법</th><th>알 수 있는 것</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th>한미 기준금리 차</th><td>한국 기준금리 − 미국 기준금리</td><td>금리 격차와 외환시장 부담을 표현</td></tr>
+                  <tr><th>국고채–기준금리 차</th><td>국고채 3년물 − 한국 기준금리</td><td>시장이 예상하는 향후 정책 방향의 단서</td></tr>
+                  <tr><th>최근 3개월 금리 변화량</th><td>현재 기준금리 − 3개월 전 기준금리</td><td>최근 정책 변화의 크기를 표현</td></tr>
+                  <tr><th>최근 3개월 금리 방향</th><td>인하 −1 · 동결 0 · 인상 +1</td><td>최근 정책의 진행 방향을 숫자로 입력</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span>모델이 맞히려는 목표값</span>
+              <small>3개월 뒤 방향</small>
+            </summary>
+            <div class="target-definition">
+              <code>3개월 뒤 기준금리 − 현재 기준금리</code>
+              <div>
+                <span><i class="cut"></i>음수 → 인하</span>
+                <span><i class="hold"></i>0 → 동결</span>
+                <span><i class="hike"></i>양수 → 인상</span>
+              </div>
+              <p>
+                Random Forest와 XGBoost는 금리 숫자를 직접 맞히는 것이 아니라
+                세 방향 중 하나를 분류하고 각 방향의 점수를 반환합니다.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
       <section class="notice">
         <strong>읽기 전에 꼭 확인하세요.</strong>
         <p>
