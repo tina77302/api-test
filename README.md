@@ -18,6 +18,8 @@ python -m ml.visualize_comparison
 
 예측 플랫폼 자동 업데이트: [한 번 실행·24시간 스케줄러·WSL cron 설정](docs/AUTOMATIC_UPDATES.md)
 
+무료 공개 배포: [Render 무료 주소와 GitHub Actions 자동 갱신](docs/FREE_DEPLOYMENT.md)
+
 ECOS 실제 데이터 수집:
 
 ```bash
