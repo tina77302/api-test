@@ -185,6 +185,72 @@
         <div id="feature-columns" class="feature-columns"></div>
       </section>
 
+      <section class="explanation-grid" id="methodology">
+        <article class="panel methodology-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">METHODOLOGY</p>
+              <h2>RateScope는 이렇게 분석합니다</h2>
+            </div>
+          </div>
+          <ol class="method-steps">
+            <li>
+              <span>01</span>
+              <div>
+                <strong>공식 경제지표 수집</strong>
+                <p>한국은행 ECOS와 FRED에서 기준금리, 물가, 환율, 실업률, 국고채와 미국 금리를 수집합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <strong>변화와 금리차 계산</strong>
+                <p>1·3·6개월 변화율, 한미 금리 차, 국고채–기준금리 차와 최근 금리 방향을 만듭니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <strong>미래 정보 차단</strong>
+                <p>TimeSeriesSplit과 3개월 gap을 적용해 미래 정답이 과거 학습에 들어가지 않게 합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>04</span>
+              <div>
+                <strong>두 머신러닝 모델 비교</strong>
+                <p>Random Forest와 XGBoost 설정을 Macro F1 기준으로 조정하고 Baseline과 비교합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>05</span>
+              <div>
+                <strong>3개월 방향 확률 산출</strong>
+                <p>각 모델이 인하·동결·인상 점수를 출력하고 두 모델을 동일 비중으로 평균합니다.</p>
+              </div>
+            </li>
+          </ol>
+        </article>
+
+        <article class="panel interpretation-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">INTERPRETATION</p>
+              <h2>현재 분석 결과</h2>
+            </div>
+          </div>
+          <div id="analysis-summary" class="analysis-summary">
+            결과를 해석하고 있습니다.
+          </div>
+          <dl id="analysis-details" class="analysis-details"></dl>
+          <div class="confidence-box">
+            <span>모델 신뢰도</span>
+            <strong id="confidence-label">검토 중</strong>
+            <p id="confidence-reason"></p>
+          </div>
+        </article>
+      </section>
+
       <section class="notice">
         <strong>읽기 전에 꼭 확인하세요.</strong>
         <p>

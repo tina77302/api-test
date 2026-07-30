@@ -212,6 +212,80 @@ function renderComparisonCharts(forecast) {
   );
 }
 
+function renderAnalysisExplanation(forecast) {
+  const probabilities = forecast.latest_ensemble.probabilities;
+  const ranking = Object.entries(probabilities).sort((a, b) => b[1] - a[1]);
+  const [firstLabel, firstValue] = ranking[0];
+  const [secondLabel, secondValue] = ranking[1];
+  const margin = firstValue - secondValue;
+  const baseline = forecast.validation.hold_baseline_metrics;
+  const forest = forecast.models.random_forest.cv_metrics;
+  const xgboost = forecast.models.xgboost.cv_metrics;
+  const distribution = forecast.validation.test_label_distribution;
+  const noHikeSamples = !distribution.인상;
+
+  document.querySelector("#analysis-summary").innerHTML = `
+    <span class="result-kicker">3개월 기본 시나리오</span>
+    <strong>${firstLabel}</strong>
+    <p>
+      모델 평균은 <b>${firstLabel} ${percent(firstValue)}</b>를 가장 높게 봅니다.
+      두 번째 시나리오인 ${secondLabel} ${percent(secondValue)}와의 차이는
+      <b>${percent(margin)}</b>입니다.
+    </p>`;
+
+  document.querySelector("#analysis-details").innerHTML = `
+    <div>
+      <dt>학습 기간</dt>
+      <dd>${forecast.analysis_period.start} — ${forecast.analysis_period.training_end}</dd>
+    </div>
+    <div>
+      <dt>학습 표본</dt>
+      <dd>${forecast.analysis_period.training_samples}개월</dd>
+    </div>
+    <div>
+      <dt>Baseline 정확도</dt>
+      <dd>${percent(baseline.accuracy)}</dd>
+    </div>
+    <div>
+      <dt>Random Forest 정확도</dt>
+      <dd>${percent(forest.accuracy)}</dd>
+    </div>
+    <div>
+      <dt>XGBoost 정확도</dt>
+      <dd>${percent(xgboost.accuracy)}</dd>
+    </div>
+    <div>
+      <dt>검증 정답 분포</dt>
+      <dd>인하 ${distribution.인하 ?? 0} · 동결 ${distribution.동결 ?? 0} · 인상 ${distribution.인상 ?? 0}</dd>
+    </div>`;
+
+  const confidenceLabel = document.querySelector("#confidence-label");
+  const confidenceReason = document.querySelector("#confidence-reason");
+  if (
+    forest.accuracy < baseline.accuracy &&
+    xgboost.accuracy < baseline.accuracy
+  ) {
+    confidenceLabel.textContent = "낮음 · 실험 단계";
+    confidenceLabel.className = "low";
+    confidenceReason.textContent =
+      `두 머신러닝 모델 모두 동결 Baseline보다 검증 정확도가 낮습니다.${
+        noHikeSamples
+          ? " 검증 기간에 실제 인상 사례도 없어 인상 탐지 능력을 평가할 수 없습니다."
+          : ""
+      }`;
+  } else if (margin < 0.15) {
+    confidenceLabel.textContent = "보통 이하 · 시나리오 경합";
+    confidenceLabel.className = "medium";
+    confidenceReason.textContent =
+      "1순위와 2순위 확률 차이가 작아 방향이 뚜렷하지 않습니다.";
+  } else {
+    confidenceLabel.textContent = "보통 · 추가 검증 필요";
+    confidenceLabel.className = "medium";
+    confidenceReason.textContent =
+      "현재 모델에서는 방향성이 나타나지만 더 많은 기간의 검증이 필요합니다.";
+  }
+}
+
 function probabilityBars(probabilities) {
   return ["인하", "동결", "인상"]
     .map(
@@ -325,6 +399,7 @@ async function loadDashboard() {
     allHistoryRows = history.rows;
     renderIndicatorCharts(allHistoryRows);
     renderComparisonCharts(forecast);
+    renderAnalysisExplanation(forecast);
     document.querySelector("#model-cards").innerHTML = Object.entries(
       forecast.models,
     )
