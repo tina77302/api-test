@@ -1,0 +1,37 @@
+{
+  "as_of_date": "2026-07-30",
+  "data_status": "partial_current_month",
+  "target": "Korea policy rate three months ahead",
+  "current_rate": 2.75,
+  "predictions": {
+    "baseline": {
+      "predicted_rate": 2.75,
+      "direction": "동결"
+    },
+    "linear_regression": {
+      "predicted_rate": 2.8039,
+      "direction": "인상"
+    }
+  },
+  "features": {
+    "current_rate": 2.75,
+    "inflation": 3.164,
+    "exchange_rate": 1500.1095,
+    "unemployment": 2.7,
+    "bond_3y": 3.8309,
+    "us_policy_rate": 3.6279
+  },
+  "source_periods": {
+    "current_rate": "20260728",
+    "inflation": "2026-06",
+    "exchange_rate": "20260701~20260730",
+    "unemployment": "2026-06",
+    "bond_3y": "20260701~20260729",
+    "us_policy_rate": "2026-07-01~2026-07-28"
+  },
+  "warnings": [
+    "현재 월이 끝나기 전의 잠정 입력을 사용했습니다.",
+    "Linear Regression은 과거 테스트에서 Baseline보다 부정확했습니다.",
+    "학습 목적의 시험 결과이며 금융·투자 판단에 사용하면 안 됩니다."
+  ]
+}
