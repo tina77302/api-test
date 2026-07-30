@@ -35,9 +35,13 @@
           </p>
         </div>
         <div class="as-of-card">
-          <span>데이터 기준일</span>
-          <strong id="as-of-date">불러오는 중</strong>
-          <small id="update-status">업데이트 상태 확인 중</small>
+          <div class="update-state">
+            <i id="update-state-dot"></i>
+            <span id="update-state-label">업데이트 확인 중</span>
+          </div>
+          <span>마지막 자동 업데이트</span>
+          <strong id="last-update-date">불러오는 중</strong>
+          <small id="update-status">데이터 기준일 확인 중</small>
         </div>
       </section>
 
@@ -62,6 +66,22 @@
           <strong>실험 단계</strong>
           <small>투자 판단용이 아닙니다</small>
         </article>
+      </section>
+
+      <section class="freshness-bar" aria-live="polite">
+        <div>
+          <span>데이터 기준일</span>
+          <strong id="as-of-date">—</strong>
+        </div>
+        <div>
+          <span>업데이트 주기</span>
+          <strong>매일 09:15 KST</strong>
+        </div>
+        <div>
+          <span>업데이트 단계</span>
+          <strong id="completed-step-count">—</strong>
+        </div>
+        <p id="freshness-message">최신 상태를 확인하고 있습니다.</p>
       </section>
 
       <section class="dashboard-grid">

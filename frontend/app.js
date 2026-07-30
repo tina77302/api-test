@@ -28,6 +28,64 @@ const featureNameMap = {
 const percent = (value, digits = 1) => `${(Number(value) * 100).toFixed(digits)}%`;
 let allHistoryRows = [];
 
+function renderUpdateStatus(status, forecast) {
+  const automation = status.automation;
+  const stateDot = document.querySelector("#update-state-dot");
+  const stateLabel = document.querySelector("#update-state-label");
+  const lastUpdate = document.querySelector("#last-update-date");
+  const message = document.querySelector("#freshness-message");
+  const stepCount = document.querySelector("#completed-step-count");
+
+  document.querySelector("#as-of-date").textContent =
+    forecast.analysis_period.latest_input;
+  document.querySelector("#update-status").textContent =
+    `수집 데이터 기준 ${forecast.analysis_period.latest_input}`;
+
+  if (!automation?.finished_at) {
+    stateDot.className = "warning";
+    stateLabel.textContent = "업데이트 기록 없음";
+    lastUpdate.textContent = "기록 없음";
+    stepCount.textContent = "확인 불가";
+    message.textContent = "자동 업데이트를 한 번 실행해주세요.";
+    message.className = "warning";
+    return;
+  }
+
+  const finishedAt = new Date(automation.finished_at);
+  const elapsedHours = (Date.now() - finishedAt.getTime()) / 3_600_000;
+  const isFailed = automation.state === "failed";
+  const isStale = elapsedHours > 30;
+  lastUpdate.textContent = finishedAt.toLocaleString("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  stepCount.textContent =
+    `${automation.completed_steps?.length ?? 0} / 7 완료`;
+
+  if (isFailed) {
+    stateDot.className = "error";
+    stateLabel.textContent = "업데이트 실패";
+    message.textContent =
+      `실패 단계: ${automation.current_step ?? "알 수 없음"}`;
+    message.className = "error";
+  } else if (isStale) {
+    stateDot.className = "warning";
+    stateLabel.textContent = "업데이트 지연";
+    message.textContent =
+      `마지막 갱신 후 ${Math.floor(elapsedHours)}시간이 지났습니다.`;
+    message.className = "warning";
+  } else {
+    stateDot.className = "success";
+    stateLabel.textContent = "최신 업데이트 완료";
+    message.textContent = "모든 데이터 수집과 모델 예측이 정상 완료됐습니다.";
+    message.className = "success";
+  }
+}
+
 function lineChart(rows, field, unit, color) {
   const values = rows.map((row) => Number(row[field])).filter(Number.isFinite);
   if (!values.length) return "";
@@ -250,8 +308,6 @@ async function loadDashboard() {
     const ensemble = forecast.latest_ensemble;
     const lastHistory = history.rows.at(-1);
 
-    document.querySelector("#as-of-date").textContent =
-      forecast.analysis_period.latest_input;
     document.querySelector("#current-rate").textContent =
       `${Number(lastHistory.current_rate).toFixed(2)}%`;
     document.querySelector("#ensemble-direction").textContent =
@@ -263,10 +319,7 @@ async function loadDashboard() {
     document.querySelector("#footer-period").textContent =
       `학습 ${forecast.analysis_period.start} — ${forecast.analysis_period.training_end}`;
 
-    const updated = status.forecast_updated_at
-      ? new Date(status.forecast_updated_at).toLocaleString("ko-KR")
-      : "기록 없음";
-    document.querySelector("#update-status").textContent = `결과 생성: ${updated}`;
+    renderUpdateStatus(status, forecast);
 
     renderHistory(history.rows);
     allHistoryRows = history.rows;
