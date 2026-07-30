@@ -115,6 +115,7 @@ def to_matrix(rows: list[dict[str, float | str]]) -> np.ndarray:
 def attach_targets(
     feature_rows: list[dict[str, float | str]],
     target_rows: list[dict[str, str]],
+    start_date: str = START_DATE,
 ) -> tuple[list[dict[str, float | str]], np.ndarray]:
     targets = {
         row["date"]: get_direction(
@@ -125,7 +126,7 @@ def attach_targets(
     }
     matched_rows = [
         row for row in feature_rows
-        if str(row["date"]) >= START_DATE and str(row["date"]) in targets
+        if str(row["date"]) >= start_date and str(row["date"]) in targets
     ]
     labels = np.array(
         [targets[str(row["date"])] for row in matched_rows],

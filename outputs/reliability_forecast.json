@@ -1,0 +1,206 @@
+{
+  "design": {
+    "training_start": "2008-01",
+    "training_end": "2026-03",
+    "training_samples": 219,
+    "features": [
+      "current_rate",
+      "inflation",
+      "exchange_rate",
+      "unemployment",
+      "bond_3y",
+      "us_policy_rate",
+      "inflation_change_1m",
+      "inflation_change_3m",
+      "inflation_change_6m",
+      "exchange_rate_change_1m_pct",
+      "exchange_rate_change_3m_pct",
+      "exchange_rate_change_6m_pct",
+      "bond_3y_change_1m",
+      "bond_3y_change_3m",
+      "bond_3y_change_6m",
+      "korea_us_rate_spread",
+      "bond_policy_spread",
+      "rate_change_3m",
+      "rate_direction_3m"
+    ],
+    "recency_weight_half_life_months": 60,
+    "hierarchy": [
+      "stage_1: change vs hold",
+      "stage_2: cut vs hike conditional on change"
+    ],
+    "target_gap_months": 3
+  },
+  "validation": {
+    "method": "nested expanding TimeSeriesSplit",
+    "outer_splits": 5,
+    "outer_test_months": 12,
+    "test_distribution": {
+      "동결": 30,
+      "인상": 20,
+      "인하": 10
+    },
+    "baseline_metrics": {
+      "accuracy": 0.5,
+      "macro_f1": 0.2222222222222222,
+      "cut_recall": 0.0,
+      "hold_recall": 1.0,
+      "hike_recall": 0.0,
+      "brier_score": 1.0
+    },
+    "model_metrics": {
+      "accuracy": 0.36666666666666664,
+      "macro_f1": 0.3230376344086021,
+      "cut_recall": 0.1,
+      "hold_recall": 0.4666666666666667,
+      "hike_recall": 0.35,
+      "brier_score": 0.7931984051136121
+    },
+    "folds": [
+      {
+        "fold": 1,
+        "train_period": [
+          "2008-01",
+          "2020-12"
+        ],
+        "test_period": [
+          "2021-04",
+          "2022-03"
+        ],
+        "test_distribution": {
+          "동결": 1,
+          "인상": 11
+        },
+        "metrics": {
+          "accuracy": 0.08333333333333333,
+          "macro_f1": 0.05128205128205129,
+          "cut_recall": 0.0,
+          "hold_recall": 1.0,
+          "hike_recall": 0.0,
+          "brier_score": 0.9937474035917052
+        }
+      },
+      {
+        "fold": 2,
+        "train_period": [
+          "2008-01",
+          "2021-12"
+        ],
+        "test_period": [
+          "2022-04",
+          "2023-03"
+        ],
+        "test_distribution": {
+          "인상": 9,
+          "동결": 3
+        },
+        "metrics": {
+          "accuracy": 0.5833333333333334,
+          "macro_f1": 0.2916666666666667,
+          "cut_recall": 0.0,
+          "hold_recall": 0.0,
+          "hike_recall": 0.7777777777777778,
+          "brier_score": 0.518127771413613
+        }
+      },
+      {
+        "fold": 3,
+        "train_period": [
+          "2008-01",
+          "2022-12"
+        ],
+        "test_period": [
+          "2023-04",
+          "2024-03"
+        ],
+        "test_distribution": {
+          "동결": 12
+        },
+        "metrics": {
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
+          "cut_recall": 0.0,
+          "hold_recall": 0.0,
+          "hike_recall": 0.0,
+          "brier_score": 1.2626350146304894
+        }
+      },
+      {
+        "fold": 4,
+        "train_period": [
+          "2008-01",
+          "2023-12"
+        ],
+        "test_period": [
+          "2024-04",
+          "2025-03"
+        ],
+        "test_distribution": {
+          "동결": 3,
+          "인하": 9
+        },
+        "metrics": {
+          "accuracy": 0.25,
+          "macro_f1": 0.13333333333333333,
+          "cut_recall": 0.0,
+          "hold_recall": 1.0,
+          "hike_recall": 0.0,
+          "brier_score": 0.7706243679678582
+        }
+      },
+      {
+        "fold": 5,
+        "train_period": [
+          "2008-01",
+          "2024-12"
+        ],
+        "test_period": [
+          "2025-04",
+          "2026-03"
+        ],
+        "test_distribution": {
+          "인하": 1,
+          "동결": 11
+        },
+        "metrics": {
+          "accuracy": 0.9166666666666666,
+          "macro_f1": 0.6507936507936508,
+          "cut_recall": 1.0,
+          "hold_recall": 0.9090909090909091,
+          "hike_recall": 0.0,
+          "brier_score": 0.42085746796439505
+        }
+      }
+    ]
+  },
+  "selected_params": {
+    "change_vs_hold": {
+      "C": 0.03,
+      "class_weight": "balanced"
+    },
+    "cut_vs_hike": {
+      "C": 1.0,
+      "class_weight": null
+    }
+  },
+  "latest_prediction": {
+    "as_of_date": "2026-07-30",
+    "current_rate": 2.75,
+    "direction": "인상",
+    "probabilities": {
+      "인하": 0.02931970412839194,
+      "동결": 0.4529098506313043,
+      "인상": 0.5177704452403038
+    }
+  },
+  "reliability_assessment": {
+    "beats_baseline_accuracy": false,
+    "beats_baseline_brier": true,
+    "status": "experimental"
+  },
+  "warnings": [
+    "월별 정책금리 자료이며 금통위 회의별 실시간 빈티지 데이터는 아닙니다.",
+    "확률 보정은 충분한 추가 표본을 확보한 뒤 별도로 검증해야 합니다.",
+    "학습용 결과이며 금융·투자 판단에 사용하면 안 됩니다."
+  ]
+}

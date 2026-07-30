@@ -64,7 +64,7 @@ function renderUpdateStatus(status, forecast) {
     minute: "2-digit",
   });
   stepCount.textContent =
-    `${automation.completed_steps?.length ?? 0} / 7 완료`;
+    `${automation.completed_steps?.length ?? 0}단계 완료`;
 
   if (isFailed) {
     stateDot.className = "error";
@@ -84,6 +84,47 @@ function renderUpdateStatus(status, forecast) {
     message.textContent = "모든 데이터 수집과 모델 예측이 정상 완료됐습니다.";
     message.className = "success";
   }
+}
+
+function renderReliability(reliability) {
+  const prediction = reliability.latest_prediction;
+  const assessment = reliability.reliability_assessment;
+  const baseline = reliability.validation.baseline_metrics;
+  const model = reliability.validation.model_metrics;
+  const status = document.querySelector("#reliability-status");
+  status.textContent =
+    assessment.status === "improved" ? "개선 확인" : "실험 단계";
+  status.classList.toggle("improved", assessment.status === "improved");
+
+  document.querySelector("#reliability-result").innerHTML = `
+    <div>
+      <span>계층형 모델 3개월 전망</span>
+      <strong>${prediction.direction}</strong>
+    </div>
+    ${probabilityBars(prediction.probabilities)}
+    <p>
+      정확도 ${assessment.beats_baseline_accuracy ? "개선" : "미개선"} ·
+      확률 오차 ${assessment.beats_baseline_brier ? "개선" : "미개선"}
+    </p>`;
+
+  const rows = [
+    ["동결 Baseline", baseline],
+    ["계층형 Logistic", model],
+  ];
+  document.querySelector("#reliability-metrics").innerHTML = rows
+    .map(
+      ([name, metric]) => `
+        <tr>
+          <th>${name}</th>
+          <td>${percent(metric.accuracy)}</td>
+          <td>${Number(metric.macro_f1).toFixed(3)}</td>
+          <td>${Number(metric.brier_score).toFixed(3)}</td>
+          <td>${percent(metric.cut_recall)}</td>
+          <td>${percent(metric.hold_recall)}</td>
+          <td>${percent(metric.hike_recall)}</td>
+        </tr>`,
+    )
+    .join("");
 }
 
 function lineChart(rows, field, unit, color) {
@@ -367,16 +408,28 @@ function renderFeatureColumn(name, features) {
 
 async function loadDashboard() {
   try {
-    const [forecastResponse, historyResponse, statusResponse] = await Promise.all([
+    const [
+      forecastResponse,
+      reliabilityResponse,
+      historyResponse,
+      statusResponse,
+    ] = await Promise.all([
       fetch("/forecast/latest"),
+      fetch("/forecast/reliability"),
       fetch("/forecast/history?months=36"),
       fetch("/forecast/status"),
     ]);
-    if (!forecastResponse.ok || !historyResponse.ok || !statusResponse.ok) {
+    if (
+      !forecastResponse.ok ||
+      !reliabilityResponse.ok ||
+      !historyResponse.ok ||
+      !statusResponse.ok
+    ) {
       throw new Error("예측 데이터를 불러오지 못했습니다.");
     }
 
     const forecast = await forecastResponse.json();
+    const reliability = await reliabilityResponse.json();
     const history = await historyResponse.json();
     const status = await statusResponse.json();
     const ensemble = forecast.latest_ensemble;
@@ -400,6 +453,7 @@ async function loadDashboard() {
     renderIndicatorCharts(allHistoryRows);
     renderComparisonCharts(forecast);
     renderAnalysisExplanation(forecast);
+    renderReliability(reliability);
     document.querySelector("#model-cards").innerHTML = Object.entries(
       forecast.models,
     )

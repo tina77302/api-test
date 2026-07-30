@@ -173,6 +173,21 @@ async def latest_forecast() -> dict:
 
 
 @app.get(
+    "/forecast/reliability",
+    tags=["금리 예측"],
+    summary="신뢰도 개선 데이터 설계 모델",
+    description=(
+        "2008년 이후 자료, 최근 가중치, 계층형 분류와 중첩 "
+        "시계열 검증을 적용한 실험 결과를 반환합니다."
+    ),
+)
+async def reliability_forecast() -> dict:
+    return read_json_file(
+        PROJECT_DIR / "outputs" / "reliability_forecast.json"
+    )
+
+
+@app.get(
     "/forecast/history",
     tags=["금리 예측"],
     summary="최근 기준금리와 경제지표 이력",

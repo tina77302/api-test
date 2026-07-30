@@ -348,6 +348,48 @@
         </div>
       </section>
 
+      <section class="panel reliability-lab">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">RELIABILITY LAB</p>
+            <h2>신뢰도를 높이기 위한 데이터 설계 실험</h2>
+          </div>
+          <span id="reliability-status" class="method-badge">불러오는 중</span>
+        </div>
+        <div class="reliability-layout">
+          <div class="design-flow">
+            <div><span>01</span><strong>2008년 이후로 확대</strong><small>더 많은 금리 국면 학습</small></div>
+            <i>→</i>
+            <div><span>02</span><strong>최근 자료 가중</strong><small>60개월마다 과거 비중 절반</small></div>
+            <i>→</i>
+            <div><span>03</span><strong>2단계 분류</strong><small>변경/동결 → 인하/인상</small></div>
+            <i>→</i>
+            <div><span>04</span><strong>중첩 시계열 검증</strong><small>설정 선택과 외부 평가 분리</small></div>
+          </div>
+          <div id="reliability-result" class="reliability-result"></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>모델</th>
+                <th>정확도</th>
+                <th>Macro F1</th>
+                <th>Brier Score</th>
+                <th>인하 탐지율</th>
+                <th>동결 탐지율</th>
+                <th>인상 탐지율</th>
+              </tr>
+            </thead>
+            <tbody id="reliability-metrics"></tbody>
+          </table>
+        </div>
+        <p class="reliability-note">
+          Brier Score는 확률 예측 오차로 낮을수록 좋습니다. 한 지표만
+          개선됐다고 신뢰도가 충분하다고 판단하지 않습니다.
+        </p>
+      </section>
+
       <section class="notice">
         <strong>읽기 전에 꼭 확인하세요.</strong>
         <p>

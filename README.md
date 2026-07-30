@@ -52,6 +52,7 @@ python -m ml.classify_rate_direction
 python -m ml.compare_direction_models
 python -m ml.post_pandemic_forecast
 python -m ml.tune_post_pandemic_models
+python -m ml.reliability_forecast
 ```
 
 분류 모델은 세 방향의 확률을 `outputs/live_prediction.json`에 저장하고,
@@ -68,6 +69,10 @@ XGBoost를 동일한 시간순 테스트 구간에서 비교한다.
 네 번째 명령은 물가·환율·국고채 금리의 시차 변화, 한미 금리 차,
 채권–정책금리 차와 최근 금리 방향을 추가한다. `TimeSeriesSplit` 안에서
 Random Forest와 XGBoost 설정을 조정하고 방향별 탐지율도 출력한다.
+
+다섯 번째 명령은 2008년 이후 데이터, 최근 관측치 가중치, 변경/동결과
+인하/인상의 2단계 분류, 중첩 시계열 검증을 적용해 Baseline 대비 정확도,
+Macro F1과 Brier Score를 함께 평가한다.
 
 ## 구조
 
@@ -97,6 +102,7 @@ uvicorn main:app --reload
 
 - `GET /health`: 서버 상태 확인
 - `GET /forecast/latest`: 최신 3개월 금리 방향과 모델 결과
+- `GET /forecast/reliability`: 신뢰도 개선 데이터 설계 실험
 - `GET /forecast/history`: 최근 월별 기준금리와 경제지표
 - `GET /forecast/status`: 자동 업데이트 실행 상태
 - `GET /users`: 전체 사용자 조회

@@ -23,6 +23,7 @@ STEPS = [
     "ml.predict_live",
     "ml.post_pandemic_forecast",
     "ml.tune_post_pandemic_models",
+    "ml.reliability_forecast",
     "ml.visualize_live_prediction",
 ]
 
