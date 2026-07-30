@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="FastAPI 사용자 관리 및 OpenAI 채팅 예제"
+    />
+    <title>FastAPI Full Stack</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <div>
+        <p class="eyebrow">FASTAPI FULL STACK</p>
+        <h1>사용자 관리와<br />AI 채팅을 한곳에서</h1>
+        <p class="hero-copy">
+          FastAPI 백엔드와 순수 JavaScript 프론트엔드가 연결된 예제입니다.
+        </p>
+      </div>
+      <nav>
+        <a href="/docs" target="_blank" rel="noreferrer">Swagger API 문서 ↗</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="panel users-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">USERS</p>
+            <h2>사용자 목록</h2>
+          </div>
+          <button id="refresh-users" class="secondary-button" type="button">
+            새로고침
+          </button>
+        </div>
+
+        <form id="user-form" class="user-form">
+          <label>
+            이름
+            <input
+              name="username"
+              minlength="2"
+              maxlength="50"
+              placeholder="honggildong"
+              required
+            />
+          </label>
+          <label>
+            이메일
+            <input
+              name="email"
+              type="email"
+              placeholder="hong@example.com"
+              required
+            />
+          </label>
+          <label>
+            나이
+            <input name="age" type="number" min="0" max="150" placeholder="25" />
+          </label>
+          <button type="submit">사용자 추가</button>
+        </form>
+
+        <p id="user-message" class="message" role="status"></p>
+        <div id="user-list" class="user-grid" aria-live="polite"></div>
+      </section>
+
+      <section class="panel chat-panel">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">OPENAI</p>
+            <h2>AI에게 질문하기</h2>
+          </div>
+          <span class="status-dot">API</span>
+        </div>
+
+        <div id="chat-log" class="chat-log" aria-live="polite">
+          <div class="bubble assistant">
+            안녕하세요. 아래 입력창에 질문을 작성해 보세요.
+          </div>
+        </div>
+
+        <form id="chat-form" class="chat-form">
+          <textarea
+            name="message"
+            maxlength="10000"
+            placeholder="FastAPI에 관해 질문해 보세요."
+            required
+          ></textarea>
+          <button type="submit">전송</button>
+        </form>
+      </section>
+    </main>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>
