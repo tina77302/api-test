@@ -5,95 +5,180 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="FastAPI 사용자 관리 및 OpenAI 채팅 예제"
+      content="경제지표와 머신러닝을 활용한 한국 기준금리 예측 대시보드"
     />
-    <title>FastAPI Full Stack</title>
+    <title>RateScope — 한국 기준금리 전망</title>
     <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
-    <header class="hero">
-      <div>
-        <p class="eyebrow">FASTAPI FULL STACK</p>
-        <h1>사용자 관리와<br />AI 채팅을 한곳에서</h1>
-        <p class="hero-copy">
-          FastAPI 백엔드와 순수 JavaScript 프론트엔드가 연결된 예제입니다.
-        </p>
-      </div>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">R</span>
+        <span>RateScope</span>
+      </a>
       <nav>
-        <a href="/docs" target="_blank" rel="noreferrer">Swagger API 문서 ↗</a>
+        <a href="#forecast">전망</a>
+        <a href="#models">모델 검증</a>
+        <a href="#features">주요 변수</a>
+        <a href="/docs" target="_blank" rel="noreferrer">API 문서 ↗</a>
       </nav>
     </header>
 
     <main>
-      <section class="panel users-panel">
-        <div class="section-heading">
-          <div>
-            <p class="eyebrow">USERS</p>
-            <h2>사용자 목록</h2>
-          </div>
-          <button id="refresh-users" class="secondary-button" type="button">
-            새로고침
-          </button>
+      <section class="hero" id="forecast">
+        <div>
+          <p class="eyebrow">BANK OF KOREA · 3 MONTH OUTLOOK</p>
+          <h1>숫자보다<br /><em>근거</em>를 보는 금리 전망</h1>
+          <p class="hero-copy">
+            한국은행·FRED 경제지표와 시계열 검증을 이용한 교육용
+            머신러닝 대시보드입니다.
+          </p>
         </div>
-
-        <form id="user-form" class="user-form">
-          <label>
-            이름
-            <input
-              name="username"
-              minlength="2"
-              maxlength="50"
-              placeholder="honggildong"
-              required
-            />
-          </label>
-          <label>
-            이메일
-            <input
-              name="email"
-              type="email"
-              placeholder="hong@example.com"
-              required
-            />
-          </label>
-          <label>
-            나이
-            <input name="age" type="number" min="0" max="150" placeholder="25" />
-          </label>
-          <button type="submit">사용자 추가</button>
-        </form>
-
-        <p id="user-message" class="message" role="status"></p>
-        <div id="user-list" class="user-grid" aria-live="polite"></div>
+        <div class="as-of-card">
+          <span>데이터 기준일</span>
+          <strong id="as-of-date">불러오는 중</strong>
+          <small id="update-status">업데이트 상태 확인 중</small>
+        </div>
       </section>
 
-      <section class="panel chat-panel">
-        <div class="section-heading">
+      <section class="summary-grid">
+        <article class="metric-card dark">
+          <span>현재 기준금리</span>
+          <strong id="current-rate">—</strong>
+          <small>한국은행 기준</small>
+        </article>
+        <article class="metric-card">
+          <span>3개월 방향 전망</span>
+          <strong id="ensemble-direction">—</strong>
+          <small>Random Forest + XGBoost 평균</small>
+        </article>
+        <article class="metric-card">
+          <span>동결 확률</span>
+          <strong id="hold-probability">—</strong>
+          <small>확률 미보정 학습값</small>
+        </article>
+        <article class="metric-card alert">
+          <span>모델 신뢰 상태</span>
+          <strong>실험 단계</strong>
+          <small>투자 판단용이 아닙니다</small>
+        </article>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel chart-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">HISTORY</p>
+              <h2>최근 기준금리 흐름</h2>
+            </div>
+            <span class="legend"><i></i> 기준금리</span>
+          </div>
+          <div id="history-chart" class="history-chart" aria-label="기준금리 차트">
+            <p class="loading">데이터를 불러오는 중입니다.</p>
+          </div>
+        </article>
+
+        <article class="panel probability-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">PROBABILITY</p>
+              <h2>모델 평균 방향 확률</h2>
+            </div>
+          </div>
+          <div id="ensemble-bars" class="probability-bars"></div>
+          <p class="panel-note">
+            두 모델의 미보정 확률을 동일 비중으로 평균한 값입니다.
+          </p>
+        </article>
+      </section>
+
+      <section class="panel" id="models">
+        <div class="panel-heading">
           <div>
-            <p class="eyebrow">OPENAI</p>
-            <h2>AI에게 질문하기</h2>
+            <p class="eyebrow">MODEL LAB</p>
+            <h2>모델별 전망과 시계열 검증</h2>
           </div>
-          <span class="status-dot">API</span>
+          <span class="method-badge">TimeSeriesSplit · gap 3개월</span>
         </div>
+        <div id="model-cards" class="model-grid"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>모델</th>
+                <th>정확도</th>
+                <th>Macro F1</th>
+                <th>인하 탐지율</th>
+                <th>동결 탐지율</th>
+                <th>인상 탐지율</th>
+              </tr>
+            </thead>
+            <tbody id="metrics-body"></tbody>
+          </table>
+        </div>
+      </section>
 
-        <div id="chat-log" class="chat-log" aria-live="polite">
-          <div class="bubble assistant">
-            안녕하세요. 아래 입력창에 질문을 작성해 보세요.
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">MACRO MONITOR</p>
+            <h2>주요 경제지표 추이</h2>
+          </div>
+          <div class="period-selector" aria-label="조회 기간">
+            <button type="button" data-months="12">1년</button>
+            <button type="button" data-months="36" class="active">3년</button>
+            <button type="button" data-months="60">5년</button>
           </div>
         </div>
+        <div id="indicator-charts" class="indicator-grid"></div>
+      </section>
 
-        <form id="chat-form" class="chat-form">
-          <textarea
-            name="message"
-            maxlength="10000"
-            placeholder="FastAPI에 관해 질문해 보세요."
-            required
-          ></textarea>
-          <button type="submit">전송</button>
-        </form>
+      <section class="visual-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">MODEL CONSENSUS</p>
+              <h2>모델별 방향 확률 비교</h2>
+            </div>
+          </div>
+          <div id="model-probability-chart" class="comparison-chart"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">BACKTEST</p>
+              <h2>검증 성능 비교</h2>
+            </div>
+          </div>
+          <div id="performance-chart" class="comparison-chart"></div>
+        </article>
+      </section>
+
+      <section class="panel" id="features">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">MODEL SIGNALS</p>
+            <h2>모델이 중요하게 본 경제지표</h2>
+          </div>
+        </div>
+        <div id="feature-columns" class="feature-columns"></div>
+      </section>
+
+      <section class="notice">
+        <strong>읽기 전에 꼭 확인하세요.</strong>
+        <p>
+          포스트 팬데믹 표본이 적고 검증 구간에 인상 사례가 없기 때문에
+          예측 확률과 변수 중요도는 불안정할 수 있습니다. 본 서비스는
+          머신러닝 학습용이며 금융 또는 투자 조언이 아닙니다.
+        </p>
       </section>
     </main>
 
+    <footer>
+      <span>RateScope · FastAPI + ECOS + FRED</span>
+      <span id="footer-period"></span>
+    </footer>
     <script src="/static/app.js" defer></script>
   </body>
 </html>

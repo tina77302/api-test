@@ -11,6 +11,30 @@
     "linear_regression": {
       "predicted_rate": 2.8039,
       "direction": "인상"
+    },
+    "direction_classifier": {
+      "predicted_direction": "동결",
+      "probabilities": {
+        "인하": 0.201011,
+        "동결": 0.614257,
+        "인상": 0.184731
+      }
+    },
+    "random_forest": {
+      "predicted_direction": "동결",
+      "probabilities": {
+        "인하": 0.224126,
+        "동결": 0.417049,
+        "인상": 0.358825
+      }
+    },
+    "xgboost": {
+      "predicted_direction": "동결",
+      "probabilities": {
+        "인하": 0.080266,
+        "동결": 0.683204,
+        "인상": 0.23653
+      }
     }
   },
   "features": {
@@ -26,12 +50,13 @@
     "inflation": "2026-06",
     "exchange_rate": "20260701~20260730",
     "unemployment": "2026-06",
-    "bond_3y": "20260701~20260729",
+    "bond_3y": "20260701~20260730",
     "us_policy_rate": "2026-07-01~2026-07-28"
   },
   "warnings": [
     "현재 월이 끝나기 전의 잠정 입력을 사용했습니다.",
     "Linear Regression은 과거 테스트에서 Baseline보다 부정확했습니다.",
+    "방향 분류 확률은 아직 확률 보정되지 않은 학습용 결과입니다.",
     "학습 목적의 시험 결과이며 금융·투자 판단에 사용하면 안 됩니다."
   ]
 }

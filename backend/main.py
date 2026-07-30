@@ -1,5 +1,7 @@
+import json
 import os
 import random
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Annotated
 
@@ -107,6 +109,21 @@ class ChatResponse(BaseModel):
     model: str = Field(description="답변 생성에 사용한 모델")
 
 
+def read_json_file(path: Path) -> dict:
+    if not path.exists():
+        raise HTTPException(
+            status_code=503,
+            detail="예측 결과가 없습니다. 자동 업데이트를 먼저 실행해주세요.",
+        )
+    try:
+        return json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        raise HTTPException(
+            status_code=500,
+            detail="예측 결과 파일을 읽을 수 없습니다.",
+        ) from exc
+
+
 def generate_mock_users() -> list[dict[str, object]]:
     return [
         {
@@ -138,6 +155,69 @@ async def frontend_home() -> FileResponse:
 )
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get(
+    "/forecast/latest",
+    tags=["금리 예측"],
+    summary="최신 3개월 기준금리 방향 예측",
+    description=(
+        "포스트 팬데믹 데이터와 시차 특성으로 튜닝한 Random Forest, "
+        "XGBoost 및 두 모델 평균 확률을 반환합니다."
+    ),
+)
+async def latest_forecast() -> dict:
+    return read_json_file(
+        PROJECT_DIR / "outputs" / "tuned_post_pandemic_forecast.json"
+    )
+
+
+@app.get(
+    "/forecast/history",
+    tags=["금리 예측"],
+    summary="최근 기준금리와 경제지표 이력",
+)
+async def forecast_history(months: int = 36) -> dict:
+    months = min(max(months, 6), 120)
+    path = (
+        PROJECT_DIR
+        / "data"
+        / "processed"
+        / "monthly_interest_rate_features.csv"
+    )
+    if not path.exists():
+        raise HTTPException(status_code=503, detail="월별 데이터가 없습니다.")
+    import csv
+
+    with path.open(encoding="utf-8", newline="") as csv_file:
+        rows = list(csv.DictReader(csv_file))[-months:]
+    return {"months": len(rows), "rows": rows}
+
+
+@app.get(
+    "/forecast/status",
+    tags=["금리 예측"],
+    summary="예측 데이터 업데이트 상태",
+)
+async def forecast_status() -> dict:
+    forecast_path = (
+        PROJECT_DIR / "outputs" / "tuned_post_pandemic_forecast.json"
+    )
+    update_path = PROJECT_DIR / "outputs" / "update_status.json"
+    response = {
+        "forecast_available": forecast_path.exists(),
+        "forecast_updated_at": None,
+        "automation": None,
+    }
+    if forecast_path.exists():
+        modified = datetime.fromtimestamp(
+            forecast_path.stat().st_mtime,
+            tz=timezone.utc,
+        )
+        response["forecast_updated_at"] = modified.isoformat()
+    if update_path.exists():
+        response["automation"] = read_json_file(update_path)
+    return response
 
 
 @app.get(
@@ -246,6 +326,10 @@ def custom_openapi() -> dict:
         {"name": "시스템", "description": "서버 동작 및 상태 확인"},
         {"name": "사용자", "description": "Mock 사용자 조회 및 등록"},
         {"name": "OpenAI", "description": "OpenAI Responses API 연동"},
+        {
+            "name": "금리 예측",
+            "description": "경제지표, 모델 검증 및 3개월 기준금리 방향 예측",
+        },
     ]
     app.openapi_schema = schema
     return schema

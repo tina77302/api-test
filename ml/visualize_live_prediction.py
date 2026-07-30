@@ -89,7 +89,7 @@ def main() -> None:
     )
     rate_axis = figure.add_subplot(grid[:, 0])
     prediction_axis = figure.add_subplot(grid[0, 1])
-    info_axis = figure.add_subplot(grid[1, 1])
+    probability_axis = figure.add_subplot(grid[1, 1])
 
     figure.suptitle(
         "Korea Policy Rate: Latest Data and 3-Month Practice Forecast",
@@ -172,37 +172,43 @@ def main() -> None:
     )
     prediction_axis.grid(axis="y", alpha=0.2)
 
-    features = payload["features"]
-    source_periods = payload["source_periods"]
-    table_rows = [
-        ["Current rate", f"{features['current_rate']:.2f}%", source_periods["current_rate"]],
-        ["Inflation YoY", f"{features['inflation']:.2f}%", source_periods["inflation"]],
-        ["KRW/USD", f"{features['exchange_rate']:.2f}", source_periods["exchange_rate"]],
-        ["Unemployment", f"{features['unemployment']:.2f}%", source_periods["unemployment"]],
-        ["KTB 3Y", f"{features['bond_3y']:.2f}%", source_periods["bond_3y"]],
-        ["US Fed funds", f"{features['us_policy_rate']:.2f}%", source_periods["us_policy_rate"]],
+    direction_result = payload["predictions"]["direction_classifier"]
+    probability_by_label = direction_result["probabilities"]
+    direction_labels = ["Cut", "Hold", "Hike"]
+    probability_values = [
+        probability_by_label["인하"] * 100,
+        probability_by_label["동결"] * 100,
+        probability_by_label["인상"] * 100,
     ]
-    info_axis.axis("off")
-    info_axis.set_title("Model inputs and source periods", pad=10)
-    table = info_axis.table(
-        cellText=table_rows,
-        colLabels=["Feature", "Value", "Source period"],
-        loc="center",
-        cellLoc="left",
-        colWidths=[0.32, 0.22, 0.46],
+    probability_bars = probability_axis.barh(
+        direction_labels,
+        probability_values,
+        color=["#377eb8", "#777777", "#e34a33"],
     )
-    table.auto_set_font_size(False)
-    table.set_fontsize(8.5)
-    table.scale(1, 1.45)
-    for column in range(3):
-        table[(0, column)].set_facecolor("#ded8cc")
-        table[(0, column)].set_text_props(weight="bold")
+    probability_axis.bar_label(
+        probability_bars,
+        fmt="%.1f%%",
+        padding=4,
+    )
+    probability_axis.set_xlim(0, max(100, max(probability_values) + 12))
+    probability_axis.set_xlabel("Uncalibrated model probability (%)")
+    predicted_direction_english = {
+        "인하": "Cut",
+        "동결": "Hold",
+        "인상": "Hike",
+    }[direction_result["predicted_direction"]]
+    probability_axis.set_title(
+        "Direction classifier: "
+        f"{predicted_direction_english}"
+    )
+    probability_axis.grid(axis="x", alpha=0.2)
 
     figure.text(
         0.5,
         0.015,
         (
-            "Partial current-month inputs. Practice model only; "
+            "Partial current-month inputs. Uncalibrated probabilities. "
+            "Practice model only; "
             "not financial or investment advice. "
             "Linear Regression underperformed the baseline in backtesting."
         ),

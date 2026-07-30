@@ -1,0 +1,90 @@
+{
+  "analysis_period": {
+    "definition": "post-pandemic",
+    "start": "2022-01",
+    "training_end": "2026-03",
+    "latest_input": "2026-07-30",
+    "training_samples": 51
+  },
+  "target": "Korea policy-rate direction three months ahead",
+  "label_distribution": {
+    "인상": 12,
+    "동결": 29,
+    "인하": 10
+  },
+  "validation": {
+    "method": "expanding-window walk-forward with a three-month target gap",
+    "test_label_distribution": {
+      "인하": 6,
+      "동결": 11
+    },
+    "results": {
+      "hold_baseline": {
+        "samples": 17,
+        "accuracy": 0.647059,
+        "balanced_accuracy": 0.333333,
+        "macro_f1": 0.261905
+      },
+      "logistic_regression": {
+        "samples": 17,
+        "accuracy": 0.411765,
+        "balanced_accuracy": 0.363636,
+        "macro_f1": 0.246032
+      },
+      "random_forest": {
+        "samples": 17,
+        "accuracy": 0.176471,
+        "balanced_accuracy": 0.166667,
+        "macro_f1": 0.133333
+      },
+      "xgboost": {
+        "samples": 17,
+        "accuracy": 0.411765,
+        "balanced_accuracy": 0.363636,
+        "macro_f1": 0.29085
+      }
+    }
+  },
+  "latest_prediction": {
+    "current_rate": 2.75,
+    "models": {
+      "logistic_regression": {
+        "direction": "동결",
+        "probabilities": {
+          "인하": 0.056472,
+          "동결": 0.741637,
+          "인상": 0.201891
+        }
+      },
+      "random_forest": {
+        "direction": "동결",
+        "probabilities": {
+          "인하": 0.144073,
+          "동결": 0.557697,
+          "인상": 0.29823
+        }
+      },
+      "xgboost": {
+        "direction": "동결",
+        "probabilities": {
+          "인하": 0.107481,
+          "동결": 0.646164,
+          "인상": 0.246355
+        }
+      }
+    },
+    "equal_weight_ml_ensemble": {
+      "direction": "동결",
+      "probabilities": {
+        "인하": 0.102675,
+        "동결": 0.648499,
+        "인상": 0.248825
+      }
+    }
+  },
+  "warnings": [
+    "2022년 이후 표본만 사용해 학습 데이터가 매우 적습니다.",
+    "확률 보정을 거치지 않은 학습용 모델 출력입니다.",
+    "금융 또는 투자 판단에 사용하면 안 됩니다."
+  ]
+}

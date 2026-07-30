@@ -130,6 +130,18 @@ data/live/latest_features.json
 python -m ml.predict_live
 ```
 
+3개월 뒤 금리 방향 분류 모델 평가:
+
+```bash
+python -m ml.classify_rate_direction
+```
+
+`current_rate`와 `rate_after_3_months`를 비교해 `인하·동결·인상` 정답을
+자동 생성한다. 로지스틱 회귀가 세 방향의 점수를 확률 형태로 반환하며,
+항상 `동결`을 선택하는 분류 Baseline과 시간순 테스트 정확도를 비교한다.
+표본이 적고 확률 보정을 하지 않았으므로 출력값은 학습용 상대 점수로
+해석해야 한다.
+
 예측 결과 시각화:
 
 ```bash

@@ -18,6 +18,7 @@ from data_pipeline.fred_client import FredClient, FredError
 RAW_DIR = PROJECT_DIR / "data" / "raw"
 PROCESSED_DIR = PROJECT_DIR / "data" / "processed"
 OUTPUT_PATH = PROCESSED_DIR / "monthly_interest_rate_data.csv"
+FEATURE_OUTPUT_PATH = PROCESSED_DIR / "monthly_interest_rate_features.csv"
 START_MONTH = "200001"
 FRED_SERIES_ID = "FEDFUNDS"
 
@@ -133,8 +134,11 @@ def add_future_target(
     return result
 
 
-def save_processed_csv(records: list[dict[str, float | str]]) -> None:
-    """병합·변환한 학습 데이터를 CSV로 저장한다."""
+def save_processed_csv(
+    records: list[dict[str, float | str]],
+    path: Path = OUTPUT_PATH,
+) -> None:
+    """병합·변환한 월별 데이터를 CSV로 저장한다."""
     if not records:
         raise EcosError("저장할 처리 데이터가 없습니다.")
 
@@ -147,9 +151,10 @@ def save_processed_csv(records: list[dict[str, float | str]]) -> None:
         "unemployment",
         "bond_3y",
         "us_policy_rate",
-        "rate_after_3_months",
     ]
-    with OUTPUT_PATH.open("w", encoding="utf-8", newline="") as csv_file:
+    if records and "rate_after_3_months" in records[0]:
+        fieldnames.append("rate_after_3_months")
+    with path.open("w", encoding="utf-8", newline="") as csv_file:
         writer = csv.DictWriter(
             csv_file,
             fieldnames=fieldnames,
@@ -212,12 +217,14 @@ def main() -> None:
         )
 
     records_with_target = add_future_target(records)
+    save_processed_csv(records, FEATURE_OUTPUT_PATH)
     save_processed_csv(records_with_target)
 
     print("\n수집 완료")
     print(f"- 공통 월 데이터: {len(records)}개")
     print(f"- 목표값 포함 학습 데이터: {len(records_with_target)}개")
     print(f"- 저장 위치: {OUTPUT_PATH}")
+    print(f"- 전체 입력 저장 위치: {FEATURE_OUTPUT_PATH}")
     if records_with_target:
         print(
             f"- 학습 가능 기간: {records_with_target[0]['date']} ~ "
