@@ -77,10 +77,18 @@ Macro F1과 Brier Score를 함께 평가한다.
 ## 구조
 
 ```text
-main.py        FastAPI 실행 진입점
-backend/       FastAPI 백엔드
-frontend/      HTML, CSS, JavaScript 프론트엔드
-.env           로컬 API 키
+main.py                 FastAPI 실행 진입점
+backend/                API와 프론트엔드 라우팅
+frontend/pages/         Home, Learn, Model, Insight 문서
+frontend/assets/css/    공통 디자인 시스템
+frontend/assets/js/     core·pages·components별 인터랙션
+frontend/assets/data/   경제 이벤트 등 화면용 정적 데이터
+data_pipeline/          ECOS·FRED 데이터 수집과 가공
+ml/                     모델 학습·검증·진단 스크립트
+automation/             예측 자동 업데이트
+docs/                   운영·분석 리포트
+outputs/                예측과 검증 결과물
+.env                    로컬 API 키(Git 제외)
 ```
 
 ## 실행

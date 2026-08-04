@@ -1,4 +1,5 @@
 import json
+import mimetypes
 import os
 import random
 from datetime import datetime, timezone
@@ -16,6 +17,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 FRONTEND_DIR = PROJECT_DIR / "frontend"
+FRONTEND_PAGES_DIR = FRONTEND_DIR / "pages"
+FRONTEND_ASSETS_DIR = FRONTEND_DIR / "assets"
 load_dotenv(PROJECT_DIR / ".env")
 
 app = FastAPI(
@@ -144,7 +147,7 @@ db_users = generate_mock_users()
 )
 async def frontend_home() -> HTMLResponse:
     return HTMLResponse(
-        (FRONTEND_DIR / "index.html").read_text(encoding="utf-8"),
+        (FRONTEND_PAGES_DIR / "index.html").read_text(encoding="utf-8"),
         headers={"Cache-Control": "no-cache"},
     )
 
@@ -152,7 +155,7 @@ async def frontend_home() -> HTMLResponse:
 @app.get("/learn", include_in_schema=False)
 async def frontend_learn() -> HTMLResponse:
     return HTMLResponse(
-        (FRONTEND_DIR / "learn.html").read_text(encoding="utf-8"),
+        (FRONTEND_PAGES_DIR / "learn.html").read_text(encoding="utf-8"),
         headers={"Cache-Control": "no-cache"},
     )
 
@@ -160,7 +163,7 @@ async def frontend_learn() -> HTMLResponse:
 @app.get("/model", include_in_schema=False)
 async def frontend_model() -> HTMLResponse:
     return HTMLResponse(
-        (FRONTEND_DIR / "model.html").read_text(encoding="utf-8"),
+        (FRONTEND_PAGES_DIR / "model.html").read_text(encoding="utf-8"),
         headers={"Cache-Control": "no-cache"},
     )
 
@@ -168,70 +171,25 @@ async def frontend_model() -> HTMLResponse:
 @app.get("/insight", include_in_schema=False)
 async def frontend_insight() -> HTMLResponse:
     return HTMLResponse(
-        (FRONTEND_DIR / "insight.html").read_text(encoding="utf-8"),
+        (FRONTEND_PAGES_DIR / "insight.html").read_text(encoding="utf-8"),
         headers={"Cache-Control": "no-cache"},
     )
 
 
-@app.get("/static/styles.css", include_in_schema=False)
-async def frontend_styles() -> Response:
+@app.get("/static/{asset_path:path}", include_in_schema=False)
+async def frontend_asset(asset_path: str) -> Response:
+    """Serve versioned frontend assets from the organized asset tree."""
+    requested = (FRONTEND_ASSETS_DIR / asset_path).resolve()
+    if not requested.is_relative_to(FRONTEND_ASSETS_DIR.resolve()):
+        raise HTTPException(status_code=404, detail="정적 파일을 찾을 수 없습니다.")
+    if not requested.is_file():
+        raise HTTPException(status_code=404, detail="정적 파일을 찾을 수 없습니다.")
+    media_type = mimetypes.guess_type(requested.name)[0]
+    if requested.suffix == ".js":
+        media_type = "text/javascript"
     return Response(
-        (FRONTEND_DIR / "styles.css").read_bytes(),
-        media_type="text/css",
-        headers={"Cache-Control": "public, max-age=31536000, immutable"},
-    )
-
-
-@app.get("/static/app.js", include_in_schema=False)
-async def frontend_script() -> Response:
-    return Response(
-        (FRONTEND_DIR / "app.js").read_bytes(),
-        media_type="text/javascript",
-        headers={"Cache-Control": "public, max-age=31536000, immutable"},
-    )
-
-
-@app.get("/static/prediction_history.js", include_in_schema=False)
-async def prediction_history_script() -> Response:
-    return Response(
-        (FRONTEND_DIR / "prediction_history.js").read_bytes(),
-        media_type="text/javascript",
-        headers={"Cache-Control": "public, max-age=31536000, immutable"},
-    )
-
-
-@app.get("/static/shared.js", include_in_schema=False)
-async def shared_script() -> Response:
-    return Response(
-        (FRONTEND_DIR / "shared.js").read_bytes(),
-        media_type="text/javascript",
-        headers={"Cache-Control": "public, max-age=31536000, immutable"},
-    )
-
-
-@app.get("/static/home.js", include_in_schema=False)
-async def home_script() -> Response:
-    return Response(
-        (FRONTEND_DIR / "home.js").read_bytes(),
-        media_type="text/javascript",
-        headers={"Cache-Control": "public, max-age=31536000, immutable"},
-    )
-
-
-@app.get("/static/learn.js", include_in_schema=False)
-async def learn_script() -> Response:
-    return Response(
-        (FRONTEND_DIR / "learn.js").read_bytes(),
-        media_type="text/javascript",
-        headers={"Cache-Control": "public, max-age=31536000, immutable"},
-    )
-
-
-@app.get("/static/economic_events.js", include_in_schema=False)
-async def economic_events_script() -> Response:
-    return Response(
-        (FRONTEND_DIR / "economic_events.js").read_bytes(),
-        media_type="text/javascript",
+        requested.read_bytes(),
+        media_type=media_type or "application/octet-stream",
         headers={"Cache-Control": "public, max-age=31536000, immutable"},
     )
 
