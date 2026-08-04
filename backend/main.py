@@ -227,6 +227,15 @@ async def learn_script() -> Response:
     )
 
 
+@app.get("/static/economic_events.js", include_in_schema=False)
+async def economic_events_script() -> Response:
+    return Response(
+        (FRONTEND_DIR / "economic_events.js").read_bytes(),
+        media_type="text/javascript",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
+
+
 @app.get(
     "/health",
     tags=["시스템"],

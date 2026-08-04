@@ -28,22 +28,33 @@ const featureNameMap = {
 const percent = (value, digits = 1) => `${(Number(value) * 100).toFixed(digits)}%`;
 let allHistoryRows = [];
 let comparisonHistoryRows = [];
-const ECONOMIC_EVENTS = [
-  {id:"financial-crisis",start:"2008-09",end:"2009-06",label:"글로벌 금융위기",short:"금융위기",tone:"crisis",category:"금융 시스템 충격",overview:"글로벌 신용 경색과 실물경제 위축이 동시에 진행된 비정상적 위험 회피 국면입니다.",impact:"성장과 물가 압력이 빠르게 약해지고 금융시장 유동성 공급이 정책의 핵심 과제가 됐습니다.",bok:"한국은행은 경기와 금융시장 안정을 위해 기준금리를 빠르게 인하하고 유동성 공급 조치를 병행했습니다.",fed:"연준은 정책금리를 사실상 제로 수준으로 낮추고 비전통적 자산매입 정책을 확대했습니다."},
-  {id:"covid",start:"2020-02",end:"2021-12",label:"코로나19 팬데믹",short:"코로나19",tone:"covid",category:"보건·공급 충격",overview:"이동 제한과 생산 차질, 대규모 정책 대응이 한꺼번에 발생해 일반적인 경기 순환 관계가 흔들린 기간입니다.",impact:"초기에는 수요 급감이, 이후에는 공급망 병목과 자산가격·물가 압력이 차례로 나타났습니다.",bok:"한국은행은 충격 초기에 금리를 낮추고 금융시장 안정 조치를 시행한 뒤 회복과 금융불균형을 보며 정상화를 시작했습니다.",fed:"연준은 제로금리와 대규모 자산매입으로 대응했고, 회복 이후 인플레이션 압력에 맞춰 긴축 전환을 준비했습니다."},
-  {id:"inflation-tightening",start:"2021-08",end:"2023-01",label:"인플레이션·긴축 전환",short:"인플레이션",tone:"inflation",category:"물가·정책 전환",overview:"공급 제약과 수요 회복으로 물가가 빠르게 상승하면서 완화 정책에서 긴축 정책으로 방향이 전환된 구간입니다.",impact:"물가 안정 필요성이 성장 둔화 우려보다 우선되며 시장금리와 환율 변동성이 확대됐습니다.",bok:"한국은행은 주요국보다 이른 시점에 금리 정상화를 시작하고 연속 인상을 통해 물가와 금융불균형에 대응했습니다.",fed:"연준은 자산매입을 종료한 뒤 빠른 폭의 연속 금리 인상으로 높은 인플레이션에 대응했습니다."},
-];
+const EVENT_DATA = window.RateScopeEconomicEvents ?? {events:[],categories:{}};
+const ECONOMIC_EVENTS = EVENT_DATA.events;
+const EVENT_CATEGORIES = EVENT_DATA.categories;
+const activeEventCategories = new Set(ECONOMIC_EVENTS.map((item) => item.category));
+let selectedEventId = null;
+let eventView = "economist";
+let eventDrawerTrigger = null;
+let storyIndex = -1;
 
 function eventForDate(date) {
-  return ECONOMIC_EVENTS.filter((item) => date >= item.start && date <= item.end).at(-1) ?? null;
+  return ECONOMIC_EVENTS.filter((item) => activeEventCategories.has(item.category) && date >= item.startDate && date <= (item.endDate ?? item.startDate)).at(-1) ?? null;
 }
 
-function openEventDrawer(eventId) {
+function renderEventDrawer(item) {
+  const category = EVENT_CATEGORIES[item.category] ?? {label:item.category,tone:item.category,marker:"•"};
+  const economist = `<section><h3>무슨 일이 있었는가?</h3><p>${item.summary}</p></section><section><h3>주요 경제적 특징</h3><ul>${(item.economicImpact ?? []).map((value)=>`<li>${value}</li>`).join("")}</ul></section><div class="event-policy-compare"><section><span>BOK</span><h3>한국은행 대응</h3><p>${item.koreaResponse ?? "표시할 데이터가 없습니다."}</p></section><section><span>FED</span><h3>미국 연준 대응</h3><p>${item.usResponse ?? "표시할 데이터가 없습니다."}</p></section></div>`;
+  const ai = `<section class="event-model-view"><h3>AI 모델에서는?</h3><p>${item.modelImpact}</p><dl><div><dt>현재 반영 변수</dt><dd>${(item.reflectedFeatures ?? []).join(" · ") || "확인 가능한 변수가 없습니다."}</dd></div><div><dt>반영하지 못한 정보</dt><dd>${(item.missingInformation ?? []).join(" · ") || "확인 가능한 정보가 없습니다."}</dd></div><div><dt>향후 개선</dt><dd>${item.improvement ?? "개선 계획을 확인 중입니다."}</dd></div></dl></section><section class="prediction-overlay-empty"><span>HISTORICAL PREDICTION</span><strong>해당 시점의 실제 저장 예측 기록이 없습니다.</strong><p>현재는 전체 모델 기준 Feature Importance만 제공됩니다. Live Prediction이나 Historical Backtest 수치를 이 이벤트의 당시 예측처럼 표시하지 않습니다.</p></section>`;
+  document.querySelector("#event-detail-title").textContent = item.title;
+  document.querySelector("#event-detail-content").innerHTML = `<div class="event-detail-meta"><span class="event-tone ${category.tone}">${category.marker}</span><strong>${category.label}</strong><time>${item.startDate} — ${item.endDate ?? "현재"}</time></div><div class="event-view-toggle" role="tablist" aria-label="이벤트 분석 관점"><button type="button" role="tab" data-event-view="economist" aria-selected="${eventView === "economist"}">Economist View</button><button type="button" role="tab" data-event-view="ai" aria-selected="${eventView === "ai"}">AI View</button></div>${eventView === "economist" ? economist : ai}<section class="event-source"><h3>기준과 관련 학습</h3><p>${item.sourceNote ?? "프로젝트 월별 데이터 범위에 맞춘 학습용 Annotation입니다."}</p><a href="${item.learnPath ?? "/learn"}">Learn에서 관련 개념 보기 →</a></section>`;
+}
+
+function openEventDrawer(eventId, trigger=null) {
   const item = ECONOMIC_EVENTS.find((event) => event.id === eventId);
   if (!item) return;
+  selectedEventId = eventId; eventDrawerTrigger = trigger ?? document.activeElement;
   const drawer = document.querySelector("#event-detail-drawer");
-  document.querySelector("#event-detail-title").textContent = item.label;
-  document.querySelector("#event-detail-content").innerHTML = `<div class="event-detail-meta"><span class="event-tone ${item.tone}"></span><strong>${item.category}</strong><time>${item.start} — ${item.end}</time></div><section><h3>사건 개요</h3><p>${item.overview}</p></section><section><h3>경제적 영향</h3><p>${item.impact}</p></section><div class="event-policy-compare"><section><span>BOK</span><h3>한국은행 정책 변화</h3><p>${item.bok}</p></section><section><span>FED</span><h3>연준 정책 변화</h3><p>${item.fed}</p></section></div>`;
+  renderEventDrawer(item);
   drawer.classList.add("open"); drawer.setAttribute("aria-hidden","false"); document.body.classList.add("drawer-open");
   drawer.querySelector(".event-drawer-panel [data-event-close]").focus();
 }
@@ -51,6 +62,7 @@ function openEventDrawer(eventId) {
 function closeEventDrawer() {
   const drawer = document.querySelector("#event-detail-drawer");
   drawer.classList.remove("open"); drawer.setAttribute("aria-hidden","true"); document.body.classList.remove("drawer-open");
+  eventDrawerTrigger?.focus?.(); eventDrawerTrigger = null;
 }
 
 function renderUpdateStatus(status, forecast) {
@@ -212,17 +224,19 @@ function renderRateExplorer(rows, indicator = "none", showUsRate = true) {
     const y = rateY(value);
     return `<line x1="${padding}" y1="${y}" x2="${width-padding}" y2="${y}" class="explorer-grid"/><text x="${padding-8}" y="${y+4}" text-anchor="end" class="explorer-axis">${value.toFixed(1)}%</text>`;
   }).join("");
-  const visibleEvents = ECONOMIC_EVENTS.filter((item) => item.end >= rows[0].date && item.start <= rows.at(-1).date);
-  document.querySelector("#economic-event-timeline").innerHTML = visibleEvents.length ? visibleEvents.map((item) => `<button type="button" data-event-id="${item.id}" class="${item.tone}" aria-label="${item.label} 상세 보기"><i></i><span>${item.short}</span><small>${item.start.slice(0,4)}</small></button>`).join("") : '<span class="event-empty">선택 기간에 표시할 주요 이벤트가 없습니다.</span>';
-  document.querySelector("#economic-event-legend").innerHTML = ECONOMIC_EVENTS.map((item) => `<span><i class="${item.tone}"></i>${item.category}</span>`).join("");
+  const visibleEvents = ECONOMIC_EVENTS.filter((item) => activeEventCategories.has(item.category) && (item.endDate ?? item.startDate) >= rows[0].date && item.startDate <= rows.at(-1).date);
+  document.querySelector("#economic-event-timeline").innerHTML = visibleEvents.length ? visibleEvents.map((item) => { const category=EVENT_CATEGORIES[item.category]; return `<button type="button" data-event-id="${item.id}" class="${category.tone} ${selectedEventId === item.id ? "selected" : ""}" aria-pressed="${selectedEventId === item.id}" aria-label="${item.title}, ${item.startDate}부터 ${item.endDate ?? "현재"}까지"><i>${category.marker}</i><span>${item.shortTitle}</span><small>${item.startDate.slice(0,4)} · ${category.label}</small></button>`; }).join("") : '<span class="event-empty">선택 기간과 범례 필터에 표시할 주요 이벤트가 없습니다.</span>';
+  const usedCategories = [...new Set(ECONOMIC_EVENTS.map((item)=>item.category))];
+  document.querySelector("#economic-event-legend").innerHTML = usedCategories.map((key) => { const category=EVENT_CATEGORIES[key]; const active=activeEventCategories.has(key); return `<button type="button" data-event-category="${key}" class="${category.tone}" aria-pressed="${active}"><i>${category.marker}</i>${category.label}</button>`; }).join("");
   const regimeBands = visibleEvents.map((item) => {
-    const startIndex = rows.findIndex((row) => row.date >= item.start);
-    let endIndex = rows.findLastIndex((row) => row.date <= item.end);
+    const category = EVENT_CATEGORIES[item.category];
+    const startIndex = rows.findIndex((row) => row.date >= item.startDate);
+    let endIndex = rows.findLastIndex((row) => row.date <= (item.endDate ?? item.startDate));
     if (startIndex < 0 || endIndex < 0 || endIndex < startIndex) return "";
     endIndex = Math.min(endIndex + 1, rows.length - 1);
     const startX = x(startIndex);
     const bandWidth = Math.max(4, x(endIndex) - startX);
-    return `<g class="regime-band ${item.tone}" data-event-id="${item.id}"><rect x="${startX}" y="${mainTop}" width="${bandWidth}" height="${mainBottom-mainTop}"/><line x1="${startX}" y1="${mainTop}" x2="${startX}" y2="${mainBottom}"/><circle cx="${startX}" cy="${mainTop + 8}" r="4"/><text x="${startX + 8}" y="${mainTop + 15}">${bandWidth > 52 ? item.short : ""}</text></g>`;
+    return `<g class="regime-band ${category.tone} ${selectedEventId === item.id ? "selected" : ""}" data-event-id="${item.id}"><rect x="${startX}" y="${mainTop}" width="${bandWidth}" height="${mainBottom-mainTop}"/><line x1="${startX}" y1="${mainTop}" x2="${startX}" y2="${mainBottom}"/><circle cx="${startX}" cy="${mainTop + 8}" r="5"/><text x="${startX + 8}" y="${mainTop + 15}">${bandWidth > 52 ? `${category.marker} ${item.shortTitle}` : category.marker}</text></g>`;
   }).join("");
   const config = {
     inflation: ["inflation", "소비자물가 상승률", "%", "물가와 정책금리의 시차 관계를 비교합니다."],
@@ -242,7 +256,8 @@ function renderRateExplorer(rows, indicator = "none", showUsRate = true) {
       <path d="${path(config[0], subY)}" class="indicator-line"/>
       <text x="${width-padding}" y="296" text-anchor="end" class="explorer-axis">${minimum.toFixed(config[0] === "exchange_rate" ? 0 : 2)} — ${maximum.toFixed(config[0] === "exchange_rate" ? 0 : 2)}${config[2]}</text>`;
   }
-  container.innerHTML = `<svg viewBox="0 0 ${width} ${totalHeight}" role="img" aria-label="한국과 미국 기준금리 비교 그래프">
+  const eventAlternative = visibleEvents.length ? `표시 이벤트: ${visibleEvents.map((item)=>`${item.title} ${item.startDate}부터 ${item.endDate ?? "현재"}`).join(", ")}` : "표시 중인 경제 이벤트 없음";
+  container.innerHTML = `<svg viewBox="0 0 ${width} ${totalHeight}" role="img" aria-label="한국과 미국 기준금리 비교 그래프. ${eventAlternative}" aria-describedby="indicator-explanation"><desc>한국 기준금리는 실선, 미국 기준금리는 점선으로 표시됩니다. 이벤트 상세는 상단 타임라인 버튼으로 확인할 수 있습니다.</desc>
     ${regimeBands}${grid}<path d="${path("current_rate", rateY)}" class="korea-rate-line"/>${showUsRate ? `<path d="${path("us_policy_rate", rateY)}" class="us-rate-line"/>` : ""}
     ${subChart}<line id="explorer-cursor" x1="0" y1="${mainTop}" x2="0" y2="${hasIndicator ? 392 : mainBottom}" class="explorer-cursor" visibility="hidden"/>
     <circle id="explorer-korea-dot" r="5" class="explorer-dot korea" visibility="hidden"/><circle id="explorer-us-dot" r="5" class="explorer-dot usa" visibility="hidden"/>
@@ -268,8 +283,10 @@ function renderRateExplorer(rows, indicator = "none", showUsRate = true) {
     const indicatorRow = config ? `<div><span>${config[1]}</span><strong>${Number(row[config[0]]).toFixed(config[0] === "exchange_rate" ? 1 : 2)}${config[2]}</strong></div>` : "";
     const usRows = showUsRate ? `<div><span>미국 기준금리</span><strong>${Number(row.us_policy_rate).toFixed(2)}%</strong></div><div><span>한미 금리 차</span><strong>${(Number(row.current_rate)-Number(row.us_policy_rate)).toFixed(2)}%p</strong></div>` : "";
     const activeEvent = eventForDate(row.date);
-    const eventRow = activeEvent ? `<section class="event-tooltip ${activeEvent.tone}"><span>${activeEvent.category}</span><b>${activeEvent.label}</b><small>${activeEvent.start} — ${activeEvent.end}</small><p>${activeEvent.overview}</p><em>클릭하여 정책 변화 보기</em></section>` : "";
-    tooltip.innerHTML = `<b>${date}</b><div><span>한국 기준금리</span><strong>${Number(row.current_rate).toFixed(2)}%</strong></div>${usRows}${indicatorRow}${eventRow}`;
+    const eventCategory = activeEvent ? EVENT_CATEGORIES[activeEvent.category] : null;
+    const viewDetails = activeEvent ? (eventView === "ai" ? `<dl><div><dt>AI 관점</dt><dd>${activeEvent.modelImpact ?? "자료 없음"}</dd></div><div><dt>예측 기록</dt><dd>해당 시점의 실제 저장 예측 기록이 없습니다.</dd></div></dl>` : `<dl><div><dt>한국은행</dt><dd>${activeEvent.koreaResponse ?? "자료 없음"}</dd></div><div><dt>연준</dt><dd>${activeEvent.usResponse ?? "자료 없음"}</dd></div><div><dt>경제 특징</dt><dd>${(activeEvent.economicImpact ?? []).join(" · ") || "자료 없음"}</dd></div></dl>`) : "";
+    const eventRow = activeEvent ? `<section class="event-tooltip ${eventCategory.tone}"><span>${eventCategory.marker} ${eventCategory.label} · ${eventView === "ai" ? "AI View" : "Economist View"}</span><b>${activeEvent.title}</b><small>${activeEvent.startDate} — ${activeEvent.endDate ?? "현재"}</small><p>${activeEvent.summary}</p>${viewDetails}<em>클릭하여 상세 학습 보기</em></section>` : "";
+    tooltip.innerHTML = `<b>${date}</b><div><span>한국 기준금리</span><strong>${Number(row.current_rate).toFixed(2)}%</strong></div>${usRows}${indicatorRow}${eventRow}<small class="tooltip-source">출처: RateScope 월별 ECOS·FRED 가공 데이터</small>`;
     tooltip.hidden = false;
     tooltip.style.left = `${Math.min(82, Math.max(18, pointX / width * 100))}%`;
   });
@@ -278,7 +295,7 @@ function renderRateExplorer(rows, indicator = "none", showUsRate = true) {
     const svgX = (event.clientX - rect.left) / rect.width * width;
     const index = Math.min(rows.length - 1, Math.max(0, Math.round((svgX - padding) / plotWidth * (rows.length - 1))));
     const activeEvent = eventForDate(rows[index].date);
-    if (activeEvent) openEventDrawer(activeEvent.id);
+    if (activeEvent) openEventDrawer(activeEvent.id, svg);
   });
   svg.addEventListener("pointerleave", () => { tooltip.hidden = true; [cursor, koreaDot, usDot].forEach((item) => item.setAttribute("visibility", "hidden")); });
 }
@@ -288,12 +305,49 @@ function initializeRateExplorer(rows) {
   let selectedPeriod = "all";
   let selectedIndicator = "none";
   let showUsRate = true;
-  document.querySelector("#economic-event-timeline").addEventListener("click", (event) => {
+  const timeline = document.querySelector("#economic-event-timeline");
+  const legend = document.querySelector("#economic-event-legend");
+  const storyControls = document.querySelector("#story-mode-controls");
+  const storySteps = [...ECONOMIC_EVENTS, {id:"current",title:"현재",summary:"최신 입력 기준의 한국·미국 정책금리와 경제지표를 확인합니다."}];
+  function renderStory() {
+    const active = storySteps[storyIndex];
+    storyControls.hidden = storyIndex < 0;
+    if (!active) return;
+    document.querySelector("#story-step").textContent = `${storyIndex + 1} / ${storySteps.length}`;
+    document.querySelector("#story-title").textContent = active.title;
+    document.querySelector("#story-summary").textContent = active.summary;
+    storyControls.querySelector('[data-story-action="previous"]').disabled = storyIndex === 0;
+    storyControls.querySelector('[data-story-action="next"]').disabled = storyIndex === storySteps.length - 1;
+  }
+  function selectStoryStep(index) {
+    storyIndex = Math.max(0,Math.min(storySteps.length-1,index));
+    const step=storySteps[storyIndex]; selectedEventId=step.id === "current" ? null : step.id;
+    renderStory(); update();
+  }
+  timeline.addEventListener("click", (event) => {
     const button = event.target.closest("[data-event-id]");
-    if (button) openEventDrawer(button.dataset.eventId);
+    if (!button) return;
+    selectedEventId=button.dataset.eventId; update(); openEventDrawer(button.dataset.eventId,timeline.querySelector(`[data-event-id="${button.dataset.eventId}"]`));
   });
+  const highlightTimelineEvent = (event) => { const button=event.target.closest?.("[data-event-id]"); if (!button) return; document.querySelectorAll(".regime-band").forEach((band)=>band.classList.toggle("hover-focus",band.dataset.eventId===button.dataset.eventId)); };
+  timeline.addEventListener("pointerover",highlightTimelineEvent); timeline.addEventListener("focusin",highlightTimelineEvent);
+  timeline.addEventListener("pointerout",()=>document.querySelectorAll(".regime-band").forEach((band)=>band.classList.remove("hover-focus")));
+  timeline.addEventListener("focusout",()=>document.querySelectorAll(".regime-band").forEach((band)=>band.classList.remove("hover-focus")));
+  legend.addEventListener("click",(event)=>{ const button=event.target.closest("[data-event-category]"); if(!button)return; const key=button.dataset.eventCategory; if(activeEventCategories.has(key))activeEventCategories.delete(key);else activeEventCategories.add(key); if(selectedEventId&&!ECONOMIC_EVENTS.some((item)=>item.id===selectedEventId&&activeEventCategories.has(item.category)))selectedEventId=null; update(); });
+  document.querySelectorAll("[data-chart-view]").forEach((button)=>button.addEventListener("click",()=>{ eventView=button.dataset.chartView; document.querySelectorAll("[data-chart-view]").forEach((item)=>item.setAttribute("aria-selected",String(item===button))); if(selectedEventId&&document.querySelector("#event-detail-drawer").classList.contains("open"))renderEventDrawer(ECONOMIC_EVENTS.find((item)=>item.id===selectedEventId)); }));
+  document.querySelector("#event-detail-content").addEventListener("click",(event)=>{ const button=event.target.closest("[data-event-view]"); if(!button)return; eventView=button.dataset.eventView; document.querySelectorAll("[data-chart-view]").forEach((item)=>item.setAttribute("aria-selected",String(item.dataset.chartView===eventView))); renderEventDrawer(ECONOMIC_EVENTS.find((item)=>item.id===selectedEventId)); });
+  document.querySelector("#story-mode-start").addEventListener("click",()=>{ selectedPeriod="all"; document.querySelectorAll("[data-rate-period]").forEach((item)=>item.classList.toggle("active",item.dataset.ratePeriod==="all")); selectStoryStep(0); });
+  storyControls.addEventListener("click",(event)=>{ const action=event.target.closest("[data-story-action]")?.dataset.storyAction; if(action==="previous")selectStoryStep(storyIndex-1); if(action==="next")selectStoryStep(storyIndex+1); if(action==="exit"){storyIndex=-1;selectedEventId=null;renderStory();update();} });
   document.querySelectorAll("[data-event-close]").forEach((button) => button.addEventListener("click", closeEventDrawer));
-  document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeEventDrawer(); });
+  document.addEventListener("keydown", (event) => {
+    const drawer=document.querySelector("#event-detail-drawer");
+    if(event.key==="Escape"&&drawer.classList.contains("open")){closeEventDrawer();return;}
+    if(event.key!=="Tab"||!drawer.classList.contains("open"))return;
+    const focusable=[...drawer.querySelectorAll('.event-drawer-panel button:not([disabled]),.event-drawer-panel a[href]')].filter((item)=>item.offsetParent!==null);
+    if(!focusable.length)return;const first=focusable[0],last=focusable.at(-1);
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+  });
   function update() {
     const count = selectedPeriod === "all" ? rows.length : Number(selectedPeriod);
     renderRateExplorer(rows.slice(-count), selectedIndicator, showUsRate);
