@@ -443,14 +443,57 @@ function renderDecisionDrivers(rows, forecast) {
 function renderFoldTimeline(forecast) {
   const models = Object.entries(forecast.models);
   const foldCount = Math.max(...models.map(([, model]) => model.folds.length));
-  document.querySelector("#fold-timeline").innerHTML = Array.from({length: foldCount}, (_, index) => {
-    const cells = models.map(([name, model]) => {
-      const fold = model.folds[index];
-      return `<div><span>${modelNameMap[name]}</span><strong>${percent(fold.metrics.accuracy)}</strong><small>Macro F1 ${Number(fold.metrics.macro_f1).toFixed(3)}</small></div>`;
+  const timeline = document.querySelector("#fold-timeline");
+  const range = document.querySelector("#timeline-range");
+  const previous = document.querySelector("#timeline-prev");
+  const next = document.querySelector("#timeline-next");
+  let selectedIndex = foldCount - 1;
+
+  range.max = String(foldCount - 1);
+  range.value = String(selectedIndex);
+  timeline.innerHTML = Array.from({length: foldCount}, (_, index) => `
+    <button class="timeline-node" type="button" role="tab" data-fold="${index}" aria-selected="false">
+      <i></i><span>FOLD ${String(index + 1).padStart(2, "0")}</span>
+    </button>`).join("");
+
+  function selectFold(index) {
+    selectedIndex = Math.min(Math.max(index, 0), foldCount - 1);
+    const sample = models[0][1].folds[selectedIndex];
+    range.value = String(selectedIndex);
+    previous.disabled = selectedIndex === 0;
+    next.disabled = selectedIndex === foldCount - 1;
+    document.querySelector("#timeline-position").textContent =
+      `${selectedIndex + 1} / ${foldCount} 구간 · ${sample.train_samples}개월 학습 → ${sample.test_samples}개월 평가`;
+    timeline.querySelectorAll(".timeline-node").forEach((node, index) => {
+      const active = index === selectedIndex;
+      node.classList.toggle("active", active);
+      node.setAttribute("aria-selected", String(active));
+    });
+
+    document.querySelector("#timeline-detail").innerHTML = models.map(([name, model]) => {
+      const metrics = model.folds[selectedIndex].metrics;
+      const recalls = [
+        ["인하", metrics.cut_recall, "cut"],
+        ["동결", metrics.hold_recall, "hold"],
+        ["인상", metrics.hike_recall, "hike"],
+      ];
+      return `<article>
+        <header><div><span>${modelNameMap[name]}</span><small>FOLD ${String(selectedIndex + 1).padStart(2, "0")}</small></div><strong>${percent(metrics.accuracy)}</strong></header>
+        <div class="timeline-score"><span>정확도</span><i><b style="width:${Number(metrics.accuracy) * 100}%"></b></i></div>
+        <div class="timeline-score"><span>Macro F1</span><i><b style="width:${Number(metrics.macro_f1) * 100}%"></b></i><em>${Number(metrics.macro_f1).toFixed(3)}</em></div>
+        <div class="recall-grid">${recalls.map(([label, value, tone]) => `<div class="${tone}"><span>${label} 탐지율</span><strong>${percent(value)}</strong></div>`).join("")}</div>
+      </article>`;
     }).join("");
-    const sample = models[0][1].folds[index];
-    return `<article><header><span>FOLD ${String(index + 1).padStart(2, "0")}</span><strong>${sample.train_samples}개월 학습 → ${sample.test_samples}개월 평가</strong></header>${cells}</article>`;
-  }).join("");
+  }
+
+  timeline.addEventListener("click", (event) => {
+    const node = event.target.closest("[data-fold]");
+    if (node) selectFold(Number(node.dataset.fold));
+  });
+  range.addEventListener("input", () => selectFold(Number(range.value)));
+  previous.addEventListener("click", () => selectFold(selectedIndex - 1));
+  next.addEventListener("click", () => selectFold(selectedIndex + 1));
+  selectFold(selectedIndex);
 }
 
 function renderWatchList(rows) {
