@@ -165,7 +165,7 @@ function renderReliabilityDiagram() {
   select("history");
 }
 
-function renderRateExplorer(rows, indicator = "none") {
+function renderRateExplorer(rows, indicator = "none", showUsRate = true) {
   const container = document.querySelector("#rate-comparison-chart");
   const tooltip = document.querySelector("#rate-chart-tooltip");
   const width = 960;
@@ -176,7 +176,9 @@ function renderRateExplorer(rows, indicator = "none") {
   const totalHeight = hasIndicator ? 430 : 290;
   const plotWidth = width - padding * 2;
   const x = (index) => padding + index / Math.max(1, rows.length - 1) * plotWidth;
-  const rates = rows.flatMap((row) => [Number(row.current_rate), Number(row.us_policy_rate)]);
+  const rates = rows.flatMap((row) => showUsRate
+    ? [Number(row.current_rate), Number(row.us_policy_rate)]
+    : [Number(row.current_rate)]);
   const rateMin = Math.floor(Math.min(...rates) * 2) / 2;
   const rateMax = Math.ceil(Math.max(...rates) * 2) / 2 || 1;
   const rateY = (value) => mainBottom - (value - rateMin) / Math.max(.5, rateMax - rateMin) * (mainBottom - mainTop);
@@ -185,6 +187,20 @@ function renderRateExplorer(rows, indicator = "none") {
     const value = rateMin + (rateMax - rateMin) * index / 4;
     const y = rateY(value);
     return `<line x1="${padding}" y1="${y}" x2="${width-padding}" y2="${y}" class="explorer-grid"/><text x="${padding-8}" y="${y+4}" text-anchor="end" class="explorer-axis">${value.toFixed(1)}%</text>`;
+  }).join("");
+  const regimes = [
+    ["2008-09", "2009-06", "글로벌 금융위기", "crisis"],
+    ["2020-02", "2021-12", "코로나19", "covid"],
+    ["2021-08", "2023-01", "급격한 금리 인상", "hiking"],
+  ];
+  const regimeBands = regimes.map(([start, end, label, tone]) => {
+    const startIndex = rows.findIndex((row) => row.date >= start);
+    let endIndex = rows.findLastIndex((row) => row.date <= end);
+    if (startIndex < 0 || endIndex < 0 || endIndex < startIndex) return "";
+    endIndex = Math.min(endIndex + 1, rows.length - 1);
+    const startX = x(startIndex);
+    const bandWidth = Math.max(4, x(endIndex) - startX);
+    return `<g class="regime-band ${tone}"><rect x="${startX}" y="${mainTop}" width="${bandWidth}" height="${mainBottom-mainTop}"/><text x="${startX + 5}" y="${mainTop + 14}">${bandWidth > 55 ? label : ""}</text></g>`;
   }).join("");
   const config = {
     inflation: ["inflation", "소비자물가 상승률", "%", "물가와 정책금리의 시차 관계를 비교합니다."],
@@ -205,7 +221,7 @@ function renderRateExplorer(rows, indicator = "none") {
       <text x="${width-padding}" y="296" text-anchor="end" class="explorer-axis">${minimum.toFixed(config[0] === "exchange_rate" ? 0 : 2)} — ${maximum.toFixed(config[0] === "exchange_rate" ? 0 : 2)}${config[2]}</text>`;
   }
   container.innerHTML = `<svg viewBox="0 0 ${width} ${totalHeight}" role="img" aria-label="한국과 미국 기준금리 비교 그래프">
-    ${grid}<path d="${path("current_rate", rateY)}" class="korea-rate-line"/><path d="${path("us_policy_rate", rateY)}" class="us-rate-line"/>
+    ${regimeBands}${grid}<path d="${path("current_rate", rateY)}" class="korea-rate-line"/>${showUsRate ? `<path d="${path("us_policy_rate", rateY)}" class="us-rate-line"/>` : ""}
     ${subChart}<line id="explorer-cursor" x1="0" y1="${mainTop}" x2="0" y2="${hasIndicator ? 392 : mainBottom}" class="explorer-cursor" visibility="hidden"/>
     <circle id="explorer-korea-dot" r="5" class="explorer-dot korea" visibility="hidden"/><circle id="explorer-us-dot" r="5" class="explorer-dot usa" visibility="hidden"/>
     <rect x="${padding}" y="${mainTop}" width="${plotWidth}" height="${hasIndicator ? 374 : mainBottom-mainTop}" class="explorer-hit"/>
@@ -223,10 +239,13 @@ function renderRateExplorer(rows, indicator = "none") {
     const row = rows[index];
     const pointX = x(index);
     cursor.setAttribute("x1", pointX); cursor.setAttribute("x2", pointX); cursor.setAttribute("visibility", "visible");
-    [[koreaDot, row.current_rate], [usDot, row.us_policy_rate]].forEach(([dot, value]) => { dot.setAttribute("cx", pointX); dot.setAttribute("cy", rateY(Number(value))); dot.setAttribute("visibility", "visible"); });
+    const visibleDots = [[koreaDot, row.current_rate]];
+    if (showUsRate) visibleDots.push([usDot, row.us_policy_rate]);
+    visibleDots.forEach(([dot, value]) => { dot.setAttribute("cx", pointX); dot.setAttribute("cy", rateY(Number(value))); dot.setAttribute("visibility", "visible"); });
     const date = new Intl.DateTimeFormat("ko-KR", {year:"numeric", month:"long"}).format(new Date(`${row.date}-01T00:00:00`));
     const indicatorRow = config ? `<div><span>${config[1]}</span><strong>${Number(row[config[0]]).toFixed(config[0] === "exchange_rate" ? 1 : 2)}${config[2]}</strong></div>` : "";
-    tooltip.innerHTML = `<b>${date}</b><div><span>한국 기준금리</span><strong>${Number(row.current_rate).toFixed(2)}%</strong></div><div><span>미국 기준금리</span><strong>${Number(row.us_policy_rate).toFixed(2)}%</strong></div><div><span>한미 금리 차</span><strong>${(Number(row.current_rate)-Number(row.us_policy_rate)).toFixed(2)}%p</strong></div>${indicatorRow}`;
+    const usRows = showUsRate ? `<div><span>미국 기준금리</span><strong>${Number(row.us_policy_rate).toFixed(2)}%</strong></div><div><span>한미 금리 차</span><strong>${(Number(row.current_rate)-Number(row.us_policy_rate)).toFixed(2)}%p</strong></div>` : "";
+    tooltip.innerHTML = `<b>${date}</b><div><span>한국 기준금리</span><strong>${Number(row.current_rate).toFixed(2)}%</strong></div>${usRows}${indicatorRow}`;
     tooltip.hidden = false;
     tooltip.style.left = `${Math.min(82, Math.max(18, pointX / width * 100))}%`;
   });
@@ -235,13 +254,33 @@ function renderRateExplorer(rows, indicator = "none") {
 
 function initializeRateExplorer(rows) {
   comparisonHistoryRows = rows;
+  let selectedPeriod = "all";
+  let selectedIndicator = "none";
+  let showUsRate = true;
+  function update() {
+    const count = selectedPeriod === "all" ? rows.length : Number(selectedPeriod);
+    renderRateExplorer(rows.slice(-count), selectedIndicator, showUsRate);
+  }
   document.querySelector(".indicator-tabs").addEventListener("click", (event) => {
     const button = event.target.closest("[data-indicator]");
     if (!button) return;
     document.querySelectorAll("[data-indicator]").forEach((item) => item.classList.toggle("active", item === button));
-    renderRateExplorer(comparisonHistoryRows, button.dataset.indicator);
+    selectedIndicator = button.dataset.indicator;
+    update();
   });
-  renderRateExplorer(rows);
+  document.querySelector(".range-tabs").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-rate-period]");
+    if (!button) return;
+    document.querySelectorAll("[data-rate-period]").forEach((item) => item.classList.toggle("active", item === button));
+    selectedPeriod = button.dataset.ratePeriod;
+    update();
+  });
+  document.querySelector("#us-rate-toggle").addEventListener("change", (event) => {
+    showUsRate = event.target.checked;
+    document.querySelector(".rate-legend span:last-child").classList.toggle("muted", !showUsRate);
+    update();
+  });
+  update();
 }
 
 function lineChart(rows, field, unit, color) {
@@ -668,7 +707,7 @@ async function loadDashboard() {
     ] = await Promise.all([
       fetch("/forecast/latest"),
       fetch("/forecast/reliability"),
-      fetch("/forecast/history?months=60"),
+      fetch("/forecast/history?months=360"),
       fetch("/forecast/status"),
     ]);
     if (

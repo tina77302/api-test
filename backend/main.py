@@ -213,7 +213,7 @@ async def reliability_forecast() -> dict:
     summary="최근 기준금리와 경제지표 이력",
 )
 async def forecast_history(months: int = 36) -> dict:
-    months = min(max(months, 6), 120)
+    months = min(max(months, 6), 360)
     path = (
         PROJECT_DIR
         / "data"
