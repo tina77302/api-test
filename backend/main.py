@@ -144,7 +144,8 @@ db_users = generate_mock_users()
 )
 async def frontend_home() -> HTMLResponse:
     return HTMLResponse(
-        (FRONTEND_DIR / "index.html").read_text(encoding="utf-8")
+        (FRONTEND_DIR / "index.html").read_text(encoding="utf-8"),
+        headers={"Cache-Control": "no-cache"},
     )
 
 
@@ -153,6 +154,7 @@ async def frontend_styles() -> Response:
     return Response(
         (FRONTEND_DIR / "styles.css").read_bytes(),
         media_type="text/css",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
     )
 
 
@@ -161,6 +163,7 @@ async def frontend_script() -> Response:
     return Response(
         (FRONTEND_DIR / "app.js").read_bytes(),
         media_type="text/javascript",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
     )
 
 
