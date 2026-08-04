@@ -142,9 +142,16 @@ function lineChart(rows, field, unit, color) {
     height - padding - ((value - minimum) / range) * (height - padding * 2);
   const points = values.map((value, index) => `${x(index)},${y(value)}`).join(" ");
   const latest = values.at(-1);
+  const hoverPoints = values
+    .map((value, index) => `
+      <circle class="hover-point" cx="${x(index)}" cy="${y(value)}" r="8">
+        <title>${rows[index].date} · ${value.toFixed(field === "exchange_rate" ? 1 : 2)}${unit}</title>
+      </circle>`)
+    .join("");
   return `
     <svg viewBox="0 0 ${width} ${height}" role="img">
       <polyline points="${points}" fill="none" stroke="${color}" stroke-width="2.5" />
+      ${hoverPoints}
       <circle cx="${x(values.length - 1)}" cy="${y(latest)}" r="4" fill="${color}" />
       <text x="${width - padding}" y="${padding}" text-anchor="end" class="spark-value">
         ${latest.toFixed(field === "exchange_rate" ? 1 : 2)}${unit}
@@ -354,6 +361,10 @@ function renderHistory(rows) {
   const points = values.map((value, index) => `${x(index)},${y(value)}`).join(" ");
   const area = `${padding},${height - padding} ${points} ${width - padding},${height - padding}`;
   const last = rows.at(-1);
+  const hoverPoints = rows.map((row, index) => `
+    <circle class="hover-point" cx="${x(index)}" cy="${y(values[index])}" r="10">
+      <title>${row.date} · 기준금리 ${values[index].toFixed(2)}%</title>
+    </circle>`).join("");
 
   container.innerHTML = `
     <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="최근 ${rows.length}개월 기준금리">
@@ -366,11 +377,92 @@ function renderHistory(rows) {
       <line x1="${padding}" y1="${height - padding}" x2="${width - padding}" y2="${height - padding}" class="axis" />
       <polygon points="${area}" fill="url(#area-fill)" />
       <polyline points="${points}" class="rate-line" />
+      ${hoverPoints}
       <circle cx="${x(values.length - 1)}" cy="${y(values.at(-1))}" r="6" class="last-dot" />
       <text x="${x(values.length - 1) - 8}" y="${y(values.at(-1)) - 14}" text-anchor="end" class="chart-value">${values.at(-1).toFixed(2)}%</text>
       <text x="${padding}" y="${height - 8}" class="chart-label">${rows[0].date}</text>
       <text x="${width - padding}" y="${height - 8}" text-anchor="end" class="chart-label">${last.date}</text>
     </svg>`;
+}
+
+function changeLabel(value, unit = "%p") {
+  const number = Number(value);
+  const arrow = number > 0 ? "↑" : number < 0 ? "↓" : "→";
+  return `${arrow} ${Math.abs(number).toFixed(2)}${unit}`;
+}
+
+function renderDecisionDrivers(rows, forecast) {
+  const latest = rows.at(-1);
+  const prior3 = rows.at(-4) ?? rows[0];
+  const signals = [
+    {
+      name: "물가 압력",
+      value: `${Number(latest.inflation).toFixed(2)}%`,
+      change: Number(latest.inflation) - Number(prior3.inflation),
+      text: "3개월 물가 변화",
+      tone: Number(latest.inflation) > Number(prior3.inflation) ? "hike" : "cut",
+    },
+    {
+      name: "원·달러 환율",
+      value: `${Number(latest.exchange_rate).toLocaleString("ko-KR", {maximumFractionDigits: 1})}원`,
+      change: ((Number(latest.exchange_rate) / Number(prior3.exchange_rate)) - 1) * 100,
+      text: "3개월 환율 변화",
+      tone: Number(latest.exchange_rate) > Number(prior3.exchange_rate) ? "hike" : "cut",
+      unit: "%",
+    },
+    {
+      name: "채권시장 기대",
+      value: `${(Number(latest.bond_3y) - Number(latest.current_rate)).toFixed(2)}%p`,
+      change: Number(latest.bond_3y) - Number(latest.current_rate),
+      text: "3년물−기준금리",
+      tone: Number(latest.bond_3y) >= Number(latest.current_rate) ? "hike" : "cut",
+    },
+    {
+      name: "한·미 금리차",
+      value: `${(Number(latest.current_rate) - Number(latest.us_policy_rate)).toFixed(2)}%p`,
+      change: Number(latest.current_rate) - Number(latest.us_policy_rate),
+      text: "한국−미국 정책금리",
+      tone: Number(latest.current_rate) < Number(latest.us_policy_rate) ? "hike" : "neutral",
+    },
+  ];
+  document.querySelector("#driver-cards").innerHTML = signals.map((item) => `
+    <article class="driver-card ${item.tone}">
+      <span>${item.name}</span><strong>${item.value}</strong>
+      <small>${item.text} · ${changeLabel(item.change, item.unit ?? "%p")}</small>
+    </article>`).join("");
+
+  const probabilities = forecast.latest_ensemble.probabilities;
+  document.querySelector("#scenario-list").innerHTML = [
+    ["인하", probabilities.인하, "물가 둔화와 경기·고용 약화가 뚜렷해질 때"],
+    ["동결", probabilities.동결, "물가와 환율 부담 속에서 관망이 필요할 때"],
+    ["인상", probabilities.인상, "물가 재상승·원화 약세·시장금리 상승이 겹칠 때"],
+  ].map(([name, value, condition]) => `
+    <div class="scenario-item ${name}"><span>${name}</span><strong>${percent(value)}</strong><p>${condition}</p></div>`).join("");
+}
+
+function renderFoldTimeline(forecast) {
+  const models = Object.entries(forecast.models);
+  const foldCount = Math.max(...models.map(([, model]) => model.folds.length));
+  document.querySelector("#fold-timeline").innerHTML = Array.from({length: foldCount}, (_, index) => {
+    const cells = models.map(([name, model]) => {
+      const fold = model.folds[index];
+      return `<div><span>${modelNameMap[name]}</span><strong>${percent(fold.metrics.accuracy)}</strong><small>Macro F1 ${Number(fold.metrics.macro_f1).toFixed(3)}</small></div>`;
+    }).join("");
+    const sample = models[0][1].folds[index];
+    return `<article><header><span>FOLD ${String(index + 1).padStart(2, "0")}</span><strong>${sample.train_samples}개월 학습 → ${sample.test_samples}개월 평가</strong></header>${cells}</article>`;
+  }).join("");
+}
+
+function renderWatchList(rows) {
+  const latest = rows.at(-1);
+  const items = [
+    ["물가", `${Number(latest.inflation).toFixed(2)}%`, "둔화 지속 여부"],
+    ["환율", `${Number(latest.exchange_rate).toFixed(1)}원`, "원화 약세 압력"],
+    ["국고채 3년", `${Number(latest.bond_3y).toFixed(2)}%`, "정책금리 선행 신호"],
+    ["미국 정책금리", `${Number(latest.us_policy_rate).toFixed(2)}%`, "한미 금리차 변화"],
+  ];
+  document.querySelector("#watch-list").innerHTML = items.map(([name, value, note], index) => `
+    <div><span>0${index + 1}</span><p><strong>${name}</strong><small>${note}</small></p><b>${value}</b></div>`).join("");
 }
 
 function renderModel(name, model) {
@@ -451,6 +543,9 @@ async function loadDashboard() {
     renderHistory(history.rows);
     allHistoryRows = history.rows;
     renderIndicatorCharts(allHistoryRows);
+    renderDecisionDrivers(allHistoryRows, forecast);
+    renderFoldTimeline(forecast);
+    renderWatchList(allHistoryRows);
     renderComparisonCharts(forecast);
     renderAnalysisExplanation(forecast);
     renderReliability(reliability);
@@ -490,7 +585,7 @@ async function loadDashboard() {
   } catch (error) {
     document.querySelector("#update-status").textContent = error.message;
     document.querySelector("#history-chart").innerHTML =
-      `<p class="error">${error.message}</p>`;
+      `<div class="error-state"><strong>대시보드를 연결하지 못했습니다</strong><p>${error.message}</p><button type="button" onclick="location.reload()">다시 시도</button></div>`;
   }
 }
 
@@ -512,6 +607,21 @@ document.querySelectorAll(".period-selector button").forEach((button) => {
         `<p class="error">${error.message}</p>`;
     }
   });
+});
+
+const savedTheme = localStorage.getItem("ratescope-theme");
+if (savedTheme === "light") document.documentElement.dataset.theme = "light";
+document.querySelector("#theme-toggle").addEventListener("click", () => {
+  const light = document.documentElement.dataset.theme !== "light";
+  document.documentElement.dataset.theme = light ? "light" : "dark";
+  localStorage.setItem("ratescope-theme", light ? "light" : "dark");
+});
+
+const glossaryDialog = document.querySelector("#glossary-dialog");
+document.querySelector("#glossary-open").addEventListener("click", () => glossaryDialog.showModal());
+document.querySelector("#glossary-close").addEventListener("click", () => glossaryDialog.close());
+glossaryDialog.addEventListener("click", (event) => {
+  if (event.target === glossaryDialog) glossaryDialog.close();
 });
 
 loadDashboard();

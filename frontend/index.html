@@ -18,9 +18,11 @@
       </a>
       <nav>
         <a href="#forecast">전망</a>
+        <a href="#drivers">예측 근거</a>
         <a href="#models">모델 검증</a>
         <a href="#features">주요 변수</a>
         <a href="/docs" target="_blank" rel="noreferrer">API 문서 ↗</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="화면 테마 변경">☼</button>
       </nav>
     </header>
 
@@ -43,6 +45,22 @@
           <strong id="last-update-date">불러오는 중</strong>
           <small id="update-status">데이터 기준일 확인 중</small>
         </div>
+      </section>
+
+      <section class="insight-grid" id="drivers">
+        <article class="panel driver-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">DECISION DRIVERS</p><h2>이번 전망을 움직인 신호</h2></div>
+            <span class="method-badge">최신 지표 기반</span>
+          </div>
+          <div id="driver-cards" class="driver-cards"><p class="loading">신호를 분석하고 있습니다.</p></div>
+        </article>
+        <article class="panel scenario-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">SCENARIO MAP</p><h2>전망이 바뀌는 조건</h2></div>
+          </div>
+          <div id="scenario-list" class="scenario-list"></div>
+        </article>
       </section>
 
       <section class="summary-grid">
@@ -172,6 +190,32 @@
             </div>
           </div>
           <div id="performance-chart" class="comparison-chart"></div>
+        </article>
+      </section>
+
+      <section class="panel validation-timeline">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">WALK-FORWARD RECORD</p>
+            <h2>시간순 검증 성과</h2>
+          </div>
+          <span class="method-badge">실제 예측 로그가 아닌 백테스트</span>
+        </div>
+        <p class="section-copy">각 시점에서 과거 데이터만 학습한 뒤 다음 구간을 평가한 결과입니다. 미래 정보가 섞이지 않도록 3개월 간격을 뒀습니다.</p>
+        <div id="fold-timeline" class="fold-timeline"></div>
+      </section>
+
+      <section class="market-grid" id="briefing">
+        <article class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">WATCH LIST</p><h2>다음 결정 전 체크할 것</h2></div></div>
+          <div id="watch-list" class="watch-list"></div>
+        </article>
+        <article class="panel official-feed">
+          <div class="panel-heading"><div><p class="eyebrow">OFFICIAL SOURCES</p><h2>일정·뉴스 확인</h2></div><span class="live-badge">공식 채널</span></div>
+          <a href="https://www.bok.or.kr/portal/bbs/B0000245/list.do?menuNo=200761" target="_blank" rel="noreferrer"><span>한국은행</span><strong>통화정책방향 및 보도자료</strong><i>↗</i></a>
+          <a href="https://www.bok.or.kr/portal/main/contents.do?menuNo=200755" target="_blank" rel="noreferrer"><span>한국은행</span><strong>금융통화위원회 일정</strong><i>↗</i></a>
+          <a href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank" rel="noreferrer"><span>Federal Reserve</span><strong>FOMC 회의 일정</strong><i>↗</i></a>
+          <p class="source-note">속보를 복제하지 않고 공식 원문으로 연결합니다. 모델 데이터 기준일과 발표일이 다를 수 있습니다.</p>
         </article>
       </section>
 
@@ -399,6 +443,19 @@
         </p>
       </section>
     </main>
+
+    <button id="glossary-open" class="glossary-fab" type="button">용어 사전 <span>?</span></button>
+    <dialog id="glossary-dialog" class="glossary-dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">QUICK GUIDE</p><h2>금리 전망 용어 사전</h2></div><button id="glossary-close" type="button" aria-label="닫기">×</button></div>
+      <div class="glossary-list">
+        <div><strong>기준금리</strong><p>한국은행이 물가와 경기를 고려해 정하는 정책금리입니다.</p></div>
+        <div><strong>Macro F1</strong><p>인하·동결·인상을 같은 비중으로 평가하는 지표입니다. 1에 가까울수록 좋습니다.</p></div>
+        <div><strong>Brier Score</strong><p>확률 예측과 실제 결과의 차이입니다. 0에 가까울수록 좋습니다.</p></div>
+        <div><strong>Baseline</strong><p>복잡한 모델이 정말 나은지 비교하기 위한 단순 기준 전략입니다.</p></div>
+        <div><strong>TimeSeriesSplit</strong><p>과거로 학습하고 그보다 미래인 구간으로 검증하는 시계열 평가법입니다.</p></div>
+        <div><strong>금리 스프레드</strong><p>두 금리의 차이로, 시장 기대나 국가 간 정책 여건을 보여줍니다.</p></div>
+      </div>
+    </dialog>
 
     <footer>
       <span>RateScope · FastAPI + ECOS + FRED</span>
