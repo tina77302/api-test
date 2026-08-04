@@ -8,7 +8,7 @@
       content="경제지표와 머신러닝을 활용한 한국 기준금리 예측 대시보드"
     />
     <title>RateScope — 한국 기준금리 전망</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260804-3" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260804-4" />
   </head>
   <body>
     <header class="topbar">
@@ -128,6 +128,23 @@
             두 모델의 미보정 확률을 동일 비중으로 평균한 값입니다.
           </p>
         </article>
+      </section>
+
+      <section class="panel rate-explorer" id="rate-explorer">
+        <div class="panel-heading">
+          <div><p class="eyebrow">RATE & MACRO EXPLORER</p><h2>한·미 금리와 경제지표 함께 보기</h2></div>
+          <div class="rate-legend"><span><i class="korea"></i>한국 기준금리</span><span><i class="usa"></i>미국 기준금리</span></div>
+        </div>
+        <div class="indicator-tabs" role="tablist" aria-label="비교 지표 선택">
+          <span>비교 지표</span>
+          <button type="button" data-indicator="none" class="active">기준금리</button>
+          <button type="button" data-indicator="inflation">물가</button>
+          <button type="button" data-indicator="exchange_rate">환율</button>
+          <button type="button" data-indicator="bond_3y">국고채 3년</button>
+        </div>
+        <div id="rate-comparison-chart" class="rate-comparison-chart"><p class="loading">비교 데이터를 불러오는 중입니다.</p></div>
+        <div id="rate-chart-tooltip" class="rate-chart-tooltip" hidden></div>
+        <p id="indicator-explanation" class="indicator-explanation">한국과 미국의 정책금리 흐름 및 한미 금리 차를 비교합니다.</p>
       </section>
 
       <section class="panel" id="models">
@@ -413,16 +430,17 @@
         </div>
         <div class="reliability-layout">
           <div class="design-flow">
-            <div><span>01</span><strong>2008년 이후로 확대</strong><small>더 많은 금리 국면 학습</small></div>
+            <button type="button" class="active" data-reliability-step="history"><span>01</span><strong>2008년 이후로 확대</strong><small>더 많은 금리 국면 학습</small></button>
             <i>→</i>
-            <div><span>02</span><strong>최근 자료 가중</strong><small>60개월마다 과거 비중 절반</small></div>
+            <button type="button" data-reliability-step="weight"><span>02</span><strong>최근 자료 가중</strong><small>60개월마다 과거 비중 절반</small></button>
             <i>→</i>
-            <div><span>03</span><strong>2단계 분류</strong><small>변경/동결 → 인하/인상</small></div>
+            <button type="button" data-reliability-step="hierarchy"><span>03</span><strong>2단계 분류</strong><small>변경/동결 → 인하/인상</small></button>
             <i>→</i>
-            <div><span>04</span><strong>중첩 시계열 검증</strong><small>설정 선택과 외부 평가 분리</small></div>
+            <button type="button" data-reliability-step="nested"><span>04</span><strong>중첩 시계열 검증</strong><small>설정 선택과 외부 평가 분리</small></button>
           </div>
           <div id="reliability-result" class="reliability-result"></div>
         </div>
+        <div id="reliability-detail" class="reliability-detail" aria-live="polite"></div>
         <div class="table-wrap">
           <table>
             <thead>
@@ -472,6 +490,6 @@
       <span>RateScope · FastAPI + ECOS + FRED</span>
       <span id="footer-period"></span>
     </footer>
-    <script src="/static/app.js?v=20260804-3" defer></script>
+    <script src="/static/app.js?v=20260804-4" defer></script>
   </body>
 </html>
