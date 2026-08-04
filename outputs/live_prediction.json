@@ -9,15 +9,15 @@
       "direction": "동결"
     },
     "linear_regression": {
-      "predicted_rate": 2.857,
+      "predicted_rate": 2.8588,
       "direction": "인상"
     },
     "direction_classifier": {
       "predicted_direction": "동결",
       "probabilities": {
-        "인하": 0.140959,
-        "동결": 0.583729,
-        "인상": 0.275312
+        "인하": 0.139052,
+        "동결": 0.582306,
+        "인상": 0.278643
       }
     },
     "random_forest": {
@@ -31,26 +31,26 @@
     "xgboost": {
       "predicted_direction": "동결",
       "probabilities": {
-        "인하": 0.074797,
-        "동결": 0.635341,
-        "인상": 0.289862
+        "인하": 0.071492,
+        "동결": 0.646462,
+        "인상": 0.282046
       }
     }
   },
   "features": {
     "current_rate": 2.75,
     "inflation": 3.164,
-    "exchange_rate": 1433.6,
+    "exchange_rate": 1431.75,
     "unemployment": 2.7,
-    "bond_3y": 3.742,
+    "bond_3y": 3.741,
     "us_policy_rate": 3.63
   },
   "source_periods": {
     "current_rate": "20260803",
     "inflation": "2026-06",
-    "exchange_rate": "20260803~20260803",
+    "exchange_rate": "20260803~20260804",
     "unemployment": "2026-06",
-    "bond_3y": "20260803~20260803",
+    "bond_3y": "20260803~20260804",
     "us_policy_rate": "2026-07-21~2026-07-31"
   },
   "warnings": [

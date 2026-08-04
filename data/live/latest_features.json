@@ -5,17 +5,17 @@
   "features": {
     "current_rate": 2.75,
     "inflation": 3.164,
-    "exchange_rate": 1433.6,
+    "exchange_rate": 1431.75,
     "unemployment": 2.7,
-    "bond_3y": 3.742,
+    "bond_3y": 3.741,
     "us_policy_rate": 3.63
   },
   "source_periods": {
     "current_rate": "20260803",
     "inflation": "2026-06",
-    "exchange_rate": "20260803~20260803",
+    "exchange_rate": "20260803~20260804",
     "unemployment": "2026-06",
-    "bond_3y": "20260803~20260803",
+    "bond_3y": "20260803~20260804",
     "us_policy_rate": "2026-07-21~2026-07-31"
   },
   "notes": [
