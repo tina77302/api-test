@@ -1,0 +1,83 @@
+{
+  "data_status": "sample",
+  "description": "UI 개발용 샘플 예측 기록입니다. 실제 한국은행 결정 기록이 아닙니다.",
+  "records": [
+    {
+      "id": "sample-2026-03",
+      "date": "2026-03",
+      "prediction": "인하",
+      "probability": 0.71,
+      "actual": "동결",
+      "correct": false,
+      "model": "XGBoost",
+      "confidence": "보통",
+      "featureImportance": [
+        {"name": "경기 흐름", "direction": "down", "importance": 0.31},
+        {"name": "소비자물가", "direction": "down", "importance": 0.25},
+        {"name": "원·달러 환율", "direction": "up", "importance": 0.18},
+        {"name": "실업률", "direction": "up", "importance": 0.14}
+      ],
+      "reason": "AI는 경기 둔화와 물가 압력 완화를 금리 인하 신호로 크게 반영했습니다.",
+      "actualReason": "실제 정책 판단에는 원화 약세와 금융안정 부담이 함께 고려되어 동결 결정이 내려졌다고 가정한 교육용 사례입니다.",
+      "policyFactors": ["환율", "금융안정", "가계부채", "글로벌 경제 상황"]
+    },
+    {
+      "id": "sample-2026-05",
+      "date": "2026-05",
+      "prediction": "동결",
+      "probability": 0.63,
+      "actual": "동결",
+      "correct": true,
+      "model": "Random Forest",
+      "confidence": "보통",
+      "featureImportance": [
+        {"name": "한미 금리 차", "direction": "down", "importance": 0.29},
+        {"name": "국고채 3년물", "direction": "up", "importance": 0.24},
+        {"name": "소비자물가", "direction": "up", "importance": 0.21},
+        {"name": "원·달러 환율", "direction": "up", "importance": 0.16}
+      ],
+      "reason": "물가와 환율 부담, 한미 금리 차가 빠른 정책 변경을 제약하는 패턴으로 나타났습니다.",
+      "actualReason": "샘플 시나리오에서 AI와 실제 결정이 일치했습니다.",
+      "policyFactors": ["물가 안정", "환율", "대외 금리 차"]
+    },
+    {
+      "id": "sample-2026-07",
+      "date": "2026-07",
+      "prediction": "인상",
+      "probability": 0.82,
+      "actual": "인상",
+      "correct": true,
+      "model": "XGBoost",
+      "confidence": "높음",
+      "featureImportance": [
+        {"name": "소비자물가", "direction": "up", "importance": 0.34},
+        {"name": "국고채 3년물", "direction": "up", "importance": 0.27},
+        {"name": "원·달러 환율", "direction": "up", "importance": 0.23},
+        {"name": "미국 기준금리", "direction": "up", "importance": 0.10}
+      ],
+      "reason": "물가 재상승과 시장금리·환율 상승이 긴축 압력을 높이는 신호로 반영됐습니다.",
+      "actualReason": "샘플 시나리오에서 데이터 기반 긴축 신호와 정책 결정이 일치했습니다.",
+      "policyFactors": ["물가 재상승", "환율", "시장금리"]
+    },
+    {
+      "id": "current-2026-08",
+      "date": "2026-08",
+      "prediction": "동결",
+      "probability": 0.49,
+      "actual": null,
+      "correct": null,
+      "model": "Random Forest + XGBoost",
+      "confidence": "낮음",
+      "current": true,
+      "featureImportance": [
+        {"name": "한미 금리 차", "direction": "down", "importance": 0.15},
+        {"name": "국고채-정책금리 차", "direction": "up", "importance": 0.14},
+        {"name": "소비자물가", "direction": "up", "importance": 0.13},
+        {"name": "6개월 물가 변화", "direction": "up", "importance": 0.12}
+      ],
+      "reason": "두 모델의 평균 확률에서 동결이 가장 높지만 인상 시나리오와의 차이가 작습니다.",
+      "actualReason": "아직 실제 결정이 발표되지 않아 평가할 수 없습니다.",
+      "policyFactors": ["향후 실제 결정 확인 필요"]
+    }
+  ]
+}

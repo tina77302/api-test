@@ -167,6 +167,15 @@ async def frontend_script() -> Response:
     )
 
 
+@app.get("/static/prediction_history.js", include_in_schema=False)
+async def prediction_history_script() -> Response:
+    return Response(
+        (FRONTEND_DIR / "prediction_history.js").read_bytes(),
+        media_type="text/javascript",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
+
+
 @app.get(
     "/health",
     tags=["시스템"],
@@ -253,6 +262,15 @@ async def forecast_status() -> dict:
     if update_path.exists():
         response["automation"] = read_json_file(update_path)
     return response
+
+
+@app.get(
+    "/prediction-history",
+    tags=["금리 예측"],
+    summary="과거 예측과 실제 결정 비교",
+)
+async def prediction_history() -> dict:
+    return read_json_file(PROJECT_DIR / "data" / "prediction_history.json")
 
 
 @app.get(

@@ -8,7 +8,7 @@
       content="경제지표와 머신러닝을 활용한 한국 기준금리 예측 대시보드"
     />
     <title>RateScope — 한국 기준금리 전망</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260804-8" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260804-9" />
   </head>
   <body>
     <header class="topbar">
@@ -20,6 +20,7 @@
         <a href="#forecast">전망</a>
         <a href="#drivers">예측 근거</a>
         <a href="#models">모델 검증</a>
+        <a class="nav-history" href="#prediction-history">예측 기록</a>
         <a href="#features">주요 변수</a>
         <a class="nav-insight" href="#insight">Insight</a>
         <a href="/docs" target="_blank" rel="noreferrer">API 문서 ↗</a>
@@ -242,6 +243,44 @@
           <div id="timeline-detail" class="timeline-detail" aria-live="polite"></div>
         </div>
       </section>
+
+      <section class="panel prediction-history" id="prediction-history">
+        <div class="panel-heading">
+          <div><p class="eyebrow">MODEL REVIEW</p><h2>Prediction History</h2><p class="history-subtitle">AI의 과거 기준금리 예측과 실제 결과를 비교합니다.</p></div>
+          <span id="history-data-status" class="method-badge">데이터 확인 중</span>
+        </div>
+        <div id="prediction-summary" class="prediction-summary"></div>
+        <div class="prediction-timeline-wrap"><span class="timeline-caption">PREDICTION TIMELINE</span><div id="prediction-timeline" class="prediction-history-timeline"></div></div>
+        <div class="table-wrap prediction-table-wrap">
+          <table class="prediction-table">
+            <thead><tr>
+              <th><button type="button" data-history-sort="date">Prediction Date <i>↕</i></button></th>
+              <th><button type="button" data-history-sort="prediction">AI Prediction <i>↕</i></button></th>
+              <th><button type="button" data-history-sort="probability">Probability <i>↕</i></button></th>
+              <th><button type="button" data-history-sort="actual">Actual Decision <i>↕</i></button></th>
+              <th><button type="button" data-history-sort="correct">Result <i>↕</i></button></th>
+            </tr></thead>
+            <tbody id="prediction-history-body"><tr><td colspan="5">예측 기록을 불러오는 중입니다.</td></tr></tbody>
+          </table>
+        </div>
+        <div class="model-learning-insight">
+          <div><p class="eyebrow">LEARNING REVIEW</p><h3>What did the model learn?</h3></div>
+          <p>AI 모델은 과거 경제지표의 패턴을 학습하여 기준금리 방향을 예측합니다. 그러나 실제 정책 결정은 경제지표뿐 아니라 금융시장 안정, 환율, 가계부채, 정책위원회의 판단 등 다양한 요소가 함께 고려됩니다.</p>
+          <p>따라서 예측이 틀렸다는 것은 모델의 실패라기보다, 모델이 학습하지 못한 정보가 실제 정책 결정에 영향을 주었을 가능성을 의미합니다.</p>
+        </div>
+        <div class="future-improvements">
+          <div class="insight-section-heading"><span class="insight-number">NEXT</span><div><p class="eyebrow">FUTURE IMPROVEMENTS</p><h3>예측 기록을 통한 다음 개선</h3></div></div>
+          <div id="future-improvement-cards" class="improvement-grid"></div>
+        </div>
+      </section>
+
+      <aside id="prediction-detail" class="prediction-detail" aria-hidden="true" aria-labelledby="prediction-detail-title">
+        <button id="prediction-detail-backdrop" class="prediction-detail-backdrop" type="button" aria-label="예측 상세 닫기"></button>
+        <div class="prediction-detail-drawer" role="dialog" aria-modal="true">
+          <header><div><p class="eyebrow">PREDICTION DETAIL</p><h2 id="prediction-detail-title">예측 상세</h2></div><button id="prediction-detail-close" type="button" aria-label="닫기">×</button></header>
+          <div id="prediction-detail-content"></div>
+        </div>
+      </aside>
 
       <section class="market-grid" id="briefing">
         <article class="panel">
@@ -644,5 +683,6 @@
       <span id="footer-period"></span>
     </footer>
     <script src="/static/app.js?v=20260804-6" defer></script>
+    <script src="/static/prediction_history.js?v=20260804-1" defer></script>
   </body>
 </html>
