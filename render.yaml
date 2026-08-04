@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: ai-ratescope
+    name: ratescope
     runtime: python
     plan: free
     buildCommand: pip install -r backend/requirements-web.txt

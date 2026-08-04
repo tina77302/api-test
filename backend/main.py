@@ -9,8 +9,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Path as ApiPath
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.utils import get_openapi
-from fastapi.responses import FileResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, Response
 from openai import AsyncOpenAI
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -143,8 +142,26 @@ db_users = generate_mock_users()
     "/",
     include_in_schema=False,
 )
-async def frontend_home() -> FileResponse:
-    return FileResponse(FRONTEND_DIR / "index.html")
+async def frontend_home() -> HTMLResponse:
+    return HTMLResponse(
+        (FRONTEND_DIR / "index.html").read_text(encoding="utf-8")
+    )
+
+
+@app.get("/static/styles.css", include_in_schema=False)
+async def frontend_styles() -> Response:
+    return Response(
+        (FRONTEND_DIR / "styles.css").read_bytes(),
+        media_type="text/css",
+    )
+
+
+@app.get("/static/app.js", include_in_schema=False)
+async def frontend_script() -> Response:
+    return Response(
+        (FRONTEND_DIR / "app.js").read_bytes(),
+        media_type="text/javascript",
+    )
 
 
 @app.get(
@@ -351,9 +368,3 @@ def custom_openapi() -> dict:
 
 
 app.openapi = custom_openapi
-
-app.mount(
-    "/static",
-    StaticFiles(directory=FRONTEND_DIR),
-    name="static",
-)
