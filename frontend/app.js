@@ -28,6 +28,30 @@ const featureNameMap = {
 const percent = (value, digits = 1) => `${(Number(value) * 100).toFixed(digits)}%`;
 let allHistoryRows = [];
 let comparisonHistoryRows = [];
+const ECONOMIC_EVENTS = [
+  {id:"financial-crisis",start:"2008-09",end:"2009-06",label:"글로벌 금융위기",short:"금융위기",tone:"crisis",category:"금융 시스템 충격",overview:"글로벌 신용 경색과 실물경제 위축이 동시에 진행된 비정상적 위험 회피 국면입니다.",impact:"성장과 물가 압력이 빠르게 약해지고 금융시장 유동성 공급이 정책의 핵심 과제가 됐습니다.",bok:"한국은행은 경기와 금융시장 안정을 위해 기준금리를 빠르게 인하하고 유동성 공급 조치를 병행했습니다.",fed:"연준은 정책금리를 사실상 제로 수준으로 낮추고 비전통적 자산매입 정책을 확대했습니다."},
+  {id:"covid",start:"2020-02",end:"2021-12",label:"코로나19 팬데믹",short:"코로나19",tone:"covid",category:"보건·공급 충격",overview:"이동 제한과 생산 차질, 대규모 정책 대응이 한꺼번에 발생해 일반적인 경기 순환 관계가 흔들린 기간입니다.",impact:"초기에는 수요 급감이, 이후에는 공급망 병목과 자산가격·물가 압력이 차례로 나타났습니다.",bok:"한국은행은 충격 초기에 금리를 낮추고 금융시장 안정 조치를 시행한 뒤 회복과 금융불균형을 보며 정상화를 시작했습니다.",fed:"연준은 제로금리와 대규모 자산매입으로 대응했고, 회복 이후 인플레이션 압력에 맞춰 긴축 전환을 준비했습니다."},
+  {id:"inflation-tightening",start:"2021-08",end:"2023-01",label:"인플레이션·긴축 전환",short:"인플레이션",tone:"inflation",category:"물가·정책 전환",overview:"공급 제약과 수요 회복으로 물가가 빠르게 상승하면서 완화 정책에서 긴축 정책으로 방향이 전환된 구간입니다.",impact:"물가 안정 필요성이 성장 둔화 우려보다 우선되며 시장금리와 환율 변동성이 확대됐습니다.",bok:"한국은행은 주요국보다 이른 시점에 금리 정상화를 시작하고 연속 인상을 통해 물가와 금융불균형에 대응했습니다.",fed:"연준은 자산매입을 종료한 뒤 빠른 폭의 연속 금리 인상으로 높은 인플레이션에 대응했습니다."},
+];
+
+function eventForDate(date) {
+  return ECONOMIC_EVENTS.filter((item) => date >= item.start && date <= item.end).at(-1) ?? null;
+}
+
+function openEventDrawer(eventId) {
+  const item = ECONOMIC_EVENTS.find((event) => event.id === eventId);
+  if (!item) return;
+  const drawer = document.querySelector("#event-detail-drawer");
+  document.querySelector("#event-detail-title").textContent = item.label;
+  document.querySelector("#event-detail-content").innerHTML = `<div class="event-detail-meta"><span class="event-tone ${item.tone}"></span><strong>${item.category}</strong><time>${item.start} — ${item.end}</time></div><section><h3>사건 개요</h3><p>${item.overview}</p></section><section><h3>경제적 영향</h3><p>${item.impact}</p></section><div class="event-policy-compare"><section><span>BOK</span><h3>한국은행 정책 변화</h3><p>${item.bok}</p></section><section><span>FED</span><h3>연준 정책 변화</h3><p>${item.fed}</p></section></div>`;
+  drawer.classList.add("open"); drawer.setAttribute("aria-hidden","false"); document.body.classList.add("drawer-open");
+  drawer.querySelector(".event-drawer-panel [data-event-close]").focus();
+}
+
+function closeEventDrawer() {
+  const drawer = document.querySelector("#event-detail-drawer");
+  drawer.classList.remove("open"); drawer.setAttribute("aria-hidden","true"); document.body.classList.remove("drawer-open");
+}
 
 function renderUpdateStatus(status, forecast) {
   const automation = status.automation;
@@ -188,19 +212,17 @@ function renderRateExplorer(rows, indicator = "none", showUsRate = true) {
     const y = rateY(value);
     return `<line x1="${padding}" y1="${y}" x2="${width-padding}" y2="${y}" class="explorer-grid"/><text x="${padding-8}" y="${y+4}" text-anchor="end" class="explorer-axis">${value.toFixed(1)}%</text>`;
   }).join("");
-  const regimes = [
-    ["2008-09", "2009-06", "글로벌 금융위기", "crisis"],
-    ["2020-02", "2021-12", "코로나19", "covid"],
-    ["2021-08", "2023-01", "급격한 금리 인상", "hiking"],
-  ];
-  const regimeBands = regimes.map(([start, end, label, tone]) => {
-    const startIndex = rows.findIndex((row) => row.date >= start);
-    let endIndex = rows.findLastIndex((row) => row.date <= end);
+  const visibleEvents = ECONOMIC_EVENTS.filter((item) => item.end >= rows[0].date && item.start <= rows.at(-1).date);
+  document.querySelector("#economic-event-timeline").innerHTML = visibleEvents.length ? visibleEvents.map((item) => `<button type="button" data-event-id="${item.id}" class="${item.tone}" aria-label="${item.label} 상세 보기"><i></i><span>${item.short}</span><small>${item.start.slice(0,4)}</small></button>`).join("") : '<span class="event-empty">선택 기간에 표시할 주요 이벤트가 없습니다.</span>';
+  document.querySelector("#economic-event-legend").innerHTML = ECONOMIC_EVENTS.map((item) => `<span><i class="${item.tone}"></i>${item.category}</span>`).join("");
+  const regimeBands = visibleEvents.map((item) => {
+    const startIndex = rows.findIndex((row) => row.date >= item.start);
+    let endIndex = rows.findLastIndex((row) => row.date <= item.end);
     if (startIndex < 0 || endIndex < 0 || endIndex < startIndex) return "";
     endIndex = Math.min(endIndex + 1, rows.length - 1);
     const startX = x(startIndex);
     const bandWidth = Math.max(4, x(endIndex) - startX);
-    return `<g class="regime-band ${tone}"><rect x="${startX}" y="${mainTop}" width="${bandWidth}" height="${mainBottom-mainTop}"/><text x="${startX + 5}" y="${mainTop + 14}">${bandWidth > 55 ? label : ""}</text></g>`;
+    return `<g class="regime-band ${item.tone}" data-event-id="${item.id}"><rect x="${startX}" y="${mainTop}" width="${bandWidth}" height="${mainBottom-mainTop}"/><line x1="${startX}" y1="${mainTop}" x2="${startX}" y2="${mainBottom}"/><circle cx="${startX}" cy="${mainTop + 8}" r="4"/><text x="${startX + 8}" y="${mainTop + 15}">${bandWidth > 52 ? item.short : ""}</text></g>`;
   }).join("");
   const config = {
     inflation: ["inflation", "소비자물가 상승률", "%", "물가와 정책금리의 시차 관계를 비교합니다."],
@@ -245,9 +267,18 @@ function renderRateExplorer(rows, indicator = "none", showUsRate = true) {
     const date = new Intl.DateTimeFormat("ko-KR", {year:"numeric", month:"long"}).format(new Date(`${row.date}-01T00:00:00`));
     const indicatorRow = config ? `<div><span>${config[1]}</span><strong>${Number(row[config[0]]).toFixed(config[0] === "exchange_rate" ? 1 : 2)}${config[2]}</strong></div>` : "";
     const usRows = showUsRate ? `<div><span>미국 기준금리</span><strong>${Number(row.us_policy_rate).toFixed(2)}%</strong></div><div><span>한미 금리 차</span><strong>${(Number(row.current_rate)-Number(row.us_policy_rate)).toFixed(2)}%p</strong></div>` : "";
-    tooltip.innerHTML = `<b>${date}</b><div><span>한국 기준금리</span><strong>${Number(row.current_rate).toFixed(2)}%</strong></div>${usRows}${indicatorRow}`;
+    const activeEvent = eventForDate(row.date);
+    const eventRow = activeEvent ? `<section class="event-tooltip ${activeEvent.tone}"><span>${activeEvent.category}</span><b>${activeEvent.label}</b><small>${activeEvent.start} — ${activeEvent.end}</small><p>${activeEvent.overview}</p><em>클릭하여 정책 변화 보기</em></section>` : "";
+    tooltip.innerHTML = `<b>${date}</b><div><span>한국 기준금리</span><strong>${Number(row.current_rate).toFixed(2)}%</strong></div>${usRows}${indicatorRow}${eventRow}`;
     tooltip.hidden = false;
     tooltip.style.left = `${Math.min(82, Math.max(18, pointX / width * 100))}%`;
+  });
+  svg.addEventListener("click", (event) => {
+    const rect = svg.getBoundingClientRect();
+    const svgX = (event.clientX - rect.left) / rect.width * width;
+    const index = Math.min(rows.length - 1, Math.max(0, Math.round((svgX - padding) / plotWidth * (rows.length - 1))));
+    const activeEvent = eventForDate(rows[index].date);
+    if (activeEvent) openEventDrawer(activeEvent.id);
   });
   svg.addEventListener("pointerleave", () => { tooltip.hidden = true; [cursor, koreaDot, usDot].forEach((item) => item.setAttribute("visibility", "hidden")); });
 }
@@ -257,6 +288,12 @@ function initializeRateExplorer(rows) {
   let selectedPeriod = "all";
   let selectedIndicator = "none";
   let showUsRate = true;
+  document.querySelector("#economic-event-timeline").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-event-id]");
+    if (button) openEventDrawer(button.dataset.eventId);
+  });
+  document.querySelectorAll("[data-event-close]").forEach((button) => button.addEventListener("click", closeEventDrawer));
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") closeEventDrawer(); });
   function update() {
     const count = selectedPeriod === "all" ? rows.length : Number(selectedPeriod);
     renderRateExplorer(rows.slice(-count), selectedIndicator, showUsRate);
