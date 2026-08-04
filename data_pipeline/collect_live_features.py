@@ -67,7 +67,9 @@ def main() -> None:
     month_start_daily = f"{today.year:04d}{today.month:02d}01"
     today_daily = today.strftime("%Y%m%d")
     current_month = today.strftime("%Y%m")
-    cpi_start_month = shift_month(today.year, today.month, -13)
+    # 확정 월별 물가는 현재 월보다 1~2개월 늦게 발표될 수 있다.
+    # 전년동월비 계산에 필요한 전년도 관측치까지 항상 포함한다.
+    cpi_start_month = shift_month(today.year, today.month, -24)
 
     ecos = EcosClient()
     fred = FredClient()
