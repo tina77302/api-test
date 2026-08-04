@@ -149,6 +149,30 @@ async def frontend_home() -> HTMLResponse:
     )
 
 
+@app.get("/learn", include_in_schema=False)
+async def frontend_learn() -> HTMLResponse:
+    return HTMLResponse(
+        (FRONTEND_DIR / "learn.html").read_text(encoding="utf-8"),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@app.get("/model", include_in_schema=False)
+async def frontend_model() -> HTMLResponse:
+    return HTMLResponse(
+        (FRONTEND_DIR / "model.html").read_text(encoding="utf-8"),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
+@app.get("/insight", include_in_schema=False)
+async def frontend_insight() -> HTMLResponse:
+    return HTMLResponse(
+        (FRONTEND_DIR / "insight.html").read_text(encoding="utf-8"),
+        headers={"Cache-Control": "no-cache"},
+    )
+
+
 @app.get("/static/styles.css", include_in_schema=False)
 async def frontend_styles() -> Response:
     return Response(
@@ -171,6 +195,33 @@ async def frontend_script() -> Response:
 async def prediction_history_script() -> Response:
     return Response(
         (FRONTEND_DIR / "prediction_history.js").read_bytes(),
+        media_type="text/javascript",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
+
+
+@app.get("/static/shared.js", include_in_schema=False)
+async def shared_script() -> Response:
+    return Response(
+        (FRONTEND_DIR / "shared.js").read_bytes(),
+        media_type="text/javascript",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
+
+
+@app.get("/static/home.js", include_in_schema=False)
+async def home_script() -> Response:
+    return Response(
+        (FRONTEND_DIR / "home.js").read_bytes(),
+        media_type="text/javascript",
+        headers={"Cache-Control": "public, max-age=31536000, immutable"},
+    )
+
+
+@app.get("/static/learn.js", include_in_schema=False)
+async def learn_script() -> Response:
+    return Response(
+        (FRONTEND_DIR / "learn.js").read_bytes(),
         media_type="text/javascript",
         headers={"Cache-Control": "public, max-age=31536000, immutable"},
     )

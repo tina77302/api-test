@@ -93,7 +93,10 @@ uvicorn main:app --reload
 
 서버 실행 후 아래 주소를 사용할 수 있습니다.
 
-- 프론트엔드: `http://127.0.0.1:8000`
+- 홈(현재 예측 요약): `http://127.0.0.1:8000`
+- 학습 센터: `http://127.0.0.1:8000/learn`
+- 모델·검증: `http://127.0.0.1:8000/model`
+- 프로젝트 인사이트: `http://127.0.0.1:8000/insight`
 - Swagger UI: `http://127.0.0.1:8000/docs`
 - ReDoc: `http://127.0.0.1:8000/redoc`
 - OpenAPI JSON: `http://127.0.0.1:8000/openapi.json`

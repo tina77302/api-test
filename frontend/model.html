@@ -1,0 +1,693 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="경제지표와 머신러닝을 활용한 한국 기준금리 예측 대시보드"
+    />
+    <title>모델 — RateScope</title>
+    <link rel="stylesheet" href="/static/styles.css?v=20260804-10" />
+  </head>
+  <body class="model-page">
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">R</span>
+        <span>RateScope</span>
+      </a>
+      <button class="mobile-menu-toggle" type="button" aria-expanded="false" aria-controls="primary-nav">메뉴</button>
+      <nav id="primary-nav">
+        <a href="/">홈</a>
+        <a href="/learn">학습</a>
+        <a class="active" href="/model" aria-current="page">모델</a>
+        <a href="/insight">인사이트</a>
+        <button id="theme-toggle" class="theme-toggle" type="button" aria-label="화면 테마 변경">☼</button>
+      </nav>
+    </header>
+
+    <main>
+      <section class="subpage-intro model-page-intro">
+        <p class="eyebrow">MODEL & VALIDATION</p>
+        <h1>데이터에서 예측까지,<br />검증 가능한 과정</h1>
+        <p>예측 목표, 데이터 구조, 모델 계산 방식, 시간순 검증과 과거 예측 기록을 기술적으로 확인합니다.</p>
+        <div class="subpage-links"><a href="#models">모델 성능</a><a href="#features">변수 분석</a><a href="#prediction-history">예측 기록</a></div>
+      </section>
+      <section class="hero" id="forecast">
+        <div>
+          <p class="eyebrow">BANK OF KOREA · 3 MONTH OUTLOOK</p>
+          <h1>숫자보다<br /><em>근거</em>를 보는 금리 전망</h1>
+          <p class="hero-copy">
+            한국은행·FRED 경제지표와 시계열 검증을 이용한 교육용
+            머신러닝 대시보드입니다.
+          </p>
+        </div>
+        <div class="as-of-card">
+          <div class="update-state">
+            <i id="update-state-dot"></i>
+            <span id="update-state-label">업데이트 확인 중</span>
+          </div>
+          <span>마지막 자동 업데이트</span>
+          <strong id="last-update-date">불러오는 중</strong>
+          <small id="update-status">데이터 기준일 확인 중</small>
+        </div>
+      </section>
+
+      <section class="insight-grid" id="drivers">
+        <article class="panel driver-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">DECISION DRIVERS</p><h2>이번 전망을 움직인 신호</h2></div>
+            <span class="method-badge">최신 지표 기반</span>
+          </div>
+          <div id="driver-cards" class="driver-cards"><p class="loading">신호를 분석하고 있습니다.</p></div>
+        </article>
+        <article class="panel scenario-panel">
+          <div class="panel-heading">
+            <div><p class="eyebrow">SCENARIO MAP</p><h2>전망이 바뀌는 조건</h2></div>
+          </div>
+          <div id="scenario-list" class="scenario-list"></div>
+        </article>
+      </section>
+
+      <section class="summary-grid">
+        <article class="metric-card dark">
+          <span>현재 기준금리</span>
+          <strong id="current-rate">—</strong>
+          <small>한국은행 기준</small>
+        </article>
+        <article class="metric-card">
+          <span>3개월 방향 전망</span>
+          <strong id="ensemble-direction">—</strong>
+          <small>Random Forest + XGBoost 평균</small>
+        </article>
+        <article class="metric-card">
+          <span>동결 확률</span>
+          <strong id="hold-probability">—</strong>
+          <small>확률 미보정 학습값</small>
+        </article>
+        <article class="metric-card alert">
+          <span>모델 신뢰 상태</span>
+          <strong>실험 단계</strong>
+          <small>투자 판단용이 아닙니다</small>
+        </article>
+      </section>
+
+      <section class="freshness-bar" aria-live="polite">
+        <div>
+          <span>데이터 기준일</span>
+          <strong id="as-of-date">—</strong>
+        </div>
+        <div>
+          <span>업데이트 주기</span>
+          <strong>매일 09:15 KST</strong>
+        </div>
+        <div>
+          <span>업데이트 단계</span>
+          <strong id="completed-step-count">—</strong>
+        </div>
+        <p id="freshness-message">최신 상태를 확인하고 있습니다.</p>
+      </section>
+
+      <section class="dashboard-grid">
+        <article class="panel chart-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">HISTORY</p>
+              <h2>최근 기준금리 흐름</h2>
+            </div>
+            <span class="legend"><i></i> 기준금리</span>
+          </div>
+          <div id="history-chart" class="history-chart" aria-label="기준금리 차트">
+            <p class="loading">데이터를 불러오는 중입니다.</p>
+          </div>
+        </article>
+
+        <article class="panel probability-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">PROBABILITY</p>
+              <h2>모델 평균 방향 확률</h2>
+            </div>
+          </div>
+          <div id="ensemble-bars" class="probability-bars"></div>
+          <p class="panel-note">
+            두 모델의 미보정 확률을 동일 비중으로 평균한 값입니다.
+          </p>
+        </article>
+      </section>
+
+      <section class="panel rate-explorer" id="rate-explorer">
+        <div class="panel-heading">
+          <div><p class="eyebrow">RATE & MACRO EXPLORER</p><h2>한·미 금리와 경제지표 함께 보기</h2></div>
+          <div class="rate-legend"><span><i class="korea"></i>한국 기준금리</span><span><i class="usa"></i>미국 기준금리</span></div>
+        </div>
+        <div class="indicator-tabs" role="tablist" aria-label="비교 지표 선택">
+          <span>비교 지표</span>
+          <button type="button" data-indicator="none" class="active">기준금리</button>
+          <button type="button" data-indicator="inflation">물가</button>
+          <button type="button" data-indicator="exchange_rate">환율</button>
+          <button type="button" data-indicator="bond_3y">국고채 3년</button>
+        </div>
+        <div class="explorer-controls">
+          <div class="range-tabs" role="tablist" aria-label="기준금리 조회 기간">
+            <span>조회 기간</span>
+            <button type="button" data-rate-period="12">1년</button>
+            <button type="button" data-rate-period="60">5년</button>
+            <button type="button" data-rate-period="all" class="active">전체</button>
+          </div>
+          <label class="us-toggle"><input id="us-rate-toggle" type="checkbox" checked /><span></span>미국 기준금리</label>
+        </div>
+        <div id="rate-comparison-chart" class="rate-comparison-chart"><p class="loading">비교 데이터를 불러오는 중입니다.</p></div>
+        <div id="rate-chart-tooltip" class="rate-chart-tooltip" hidden></div>
+        <p id="indicator-explanation" class="indicator-explanation">한국과 미국의 정책금리 흐름 및 한미 금리 차를 비교합니다.</p>
+      </section>
+
+      <section class="panel" id="models">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">MODEL LAB</p>
+            <h2>모델별 전망과 시계열 검증</h2>
+          </div>
+          <span class="method-badge">TimeSeriesSplit · gap 3개월</span>
+        </div>
+        <div id="model-cards" class="model-grid"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>모델</th>
+                <th>정확도</th>
+                <th>Macro F1</th>
+                <th>인하 탐지율</th>
+                <th>동결 탐지율</th>
+                <th>인상 탐지율</th>
+              </tr>
+            </thead>
+            <tbody id="metrics-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">MACRO MONITOR</p>
+            <h2>주요 경제지표 추이</h2>
+          </div>
+          <div class="period-selector" aria-label="조회 기간">
+            <button type="button" data-months="12">1년</button>
+            <button type="button" data-months="36" class="active">3년</button>
+            <button type="button" data-months="60">5년</button>
+          </div>
+        </div>
+        <div id="indicator-charts" class="indicator-grid"></div>
+      </section>
+
+      <section class="visual-grid">
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">MODEL CONSENSUS</p>
+              <h2>모델별 방향 확률 비교</h2>
+            </div>
+          </div>
+          <div id="model-probability-chart" class="comparison-chart"></div>
+        </article>
+
+        <article class="panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">BACKTEST</p>
+              <h2>검증 성능 비교</h2>
+            </div>
+          </div>
+          <div id="performance-chart" class="comparison-chart"></div>
+        </article>
+      </section>
+
+      <section class="panel validation-timeline">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">WALK-FORWARD RECORD</p>
+            <h2>시간순 검증 성과</h2>
+          </div>
+          <span class="method-badge">실제 예측 로그가 아닌 백테스트</span>
+        </div>
+        <p class="section-copy">각 시점에서 과거 데이터만 학습한 뒤 다음 구간을 평가한 결과입니다. 미래 정보가 섞이지 않도록 3개월 간격을 뒀습니다.</p>
+        <div class="timeline-shell">
+          <div class="timeline-toolbar">
+            <button id="timeline-prev" type="button" aria-label="이전 검증 구간">←</button>
+            <div>
+              <span id="timeline-position">검증 구간 불러오는 중</span>
+              <input id="timeline-range" type="range" min="0" max="0" value="0" aria-label="검증 구간 선택" />
+            </div>
+            <button id="timeline-next" type="button" aria-label="다음 검증 구간">→</button>
+          </div>
+          <div id="fold-timeline" class="fold-timeline" role="tablist" aria-label="시간순 검증 구간"></div>
+          <div id="timeline-detail" class="timeline-detail" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="panel prediction-history" id="prediction-history">
+        <div class="panel-heading">
+          <div><p class="eyebrow">MODEL REVIEW</p><h2>Prediction History</h2><p class="history-subtitle">AI의 과거 기준금리 예측과 실제 결과를 비교합니다.</p></div>
+          <span id="history-data-status" class="method-badge">데이터 확인 중</span>
+        </div>
+        <div id="prediction-summary" class="prediction-summary"></div>
+        <div class="prediction-timeline-wrap"><span class="timeline-caption">PREDICTION TIMELINE</span><div id="prediction-timeline" class="prediction-history-timeline"></div></div>
+        <div class="table-wrap prediction-table-wrap">
+          <table class="prediction-table">
+            <thead><tr>
+              <th><button type="button" data-history-sort="date">Prediction Date <i>↕</i></button></th>
+              <th><button type="button" data-history-sort="prediction">AI Prediction <i>↕</i></button></th>
+              <th><button type="button" data-history-sort="probability">Probability <i>↕</i></button></th>
+              <th><button type="button" data-history-sort="actual">Actual Decision <i>↕</i></button></th>
+              <th><button type="button" data-history-sort="correct">Result <i>↕</i></button></th>
+            </tr></thead>
+            <tbody id="prediction-history-body"><tr><td colspan="5">예측 기록을 불러오는 중입니다.</td></tr></tbody>
+          </table>
+        </div>
+        <div class="model-learning-insight">
+          <div><p class="eyebrow">LEARNING REVIEW</p><h3>What did the model learn?</h3></div>
+          <p>AI 모델은 과거 경제지표의 패턴을 학습하여 기준금리 방향을 예측합니다. 그러나 실제 정책 결정은 경제지표뿐 아니라 금융시장 안정, 환율, 가계부채, 정책위원회의 판단 등 다양한 요소가 함께 고려됩니다.</p>
+          <p>따라서 예측이 틀렸다는 것은 모델의 실패라기보다, 모델이 학습하지 못한 정보가 실제 정책 결정에 영향을 주었을 가능성을 의미합니다.</p>
+        </div>
+        <div class="future-improvements">
+          <div class="insight-section-heading"><span class="insight-number">NEXT</span><div><p class="eyebrow">FUTURE IMPROVEMENTS</p><h3>예측 기록을 통한 다음 개선</h3></div></div>
+          <div id="future-improvement-cards" class="improvement-grid"></div>
+        </div>
+      </section>
+
+      <aside id="prediction-detail" class="prediction-detail" aria-hidden="true" aria-labelledby="prediction-detail-title">
+        <button id="prediction-detail-backdrop" class="prediction-detail-backdrop" type="button" aria-label="예측 상세 닫기"></button>
+        <div class="prediction-detail-drawer" role="dialog" aria-modal="true">
+          <header><div><p class="eyebrow">PREDICTION DETAIL</p><h2 id="prediction-detail-title">예측 상세</h2></div><button id="prediction-detail-close" type="button" aria-label="닫기">×</button></header>
+          <div id="prediction-detail-content"></div>
+        </div>
+      </aside>
+
+      <section class="market-grid" id="briefing">
+        <article class="panel">
+          <div class="panel-heading"><div><p class="eyebrow">WATCH LIST</p><h2>다음 결정 전 체크할 것</h2></div></div>
+          <div id="watch-list" class="watch-list"></div>
+        </article>
+        <article class="panel official-feed">
+          <div class="panel-heading"><div><p class="eyebrow">OFFICIAL SOURCES</p><h2>일정·뉴스 확인</h2></div><span class="live-badge">공식 채널</span></div>
+          <a href="https://www.bok.or.kr/portal/bbs/B0000245/list.do?menuNo=200761" target="_blank" rel="noreferrer"><span>한국은행</span><strong>통화정책방향 및 보도자료</strong><i>↗</i></a>
+          <a href="https://www.bok.or.kr/portal/main/contents.do?menuNo=200755" target="_blank" rel="noreferrer"><span>한국은행</span><strong>금융통화위원회 일정</strong><i>↗</i></a>
+          <a href="https://www.federalreserve.gov/monetarypolicy/fomccalendars.htm" target="_blank" rel="noreferrer"><span>Federal Reserve</span><strong>FOMC 회의 일정</strong><i>↗</i></a>
+          <p class="source-note">속보를 복제하지 않고 공식 원문으로 연결합니다. 모델 데이터 기준일과 발표일이 다를 수 있습니다.</p>
+        </article>
+      </section>
+
+      <section class="panel" id="features">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">MODEL SIGNALS</p>
+            <h2>모델이 중요하게 본 경제지표</h2>
+          </div>
+        </div>
+        <div id="feature-columns" class="feature-columns"></div>
+      </section>
+
+      <section class="panel model-classroom" id="model-classroom">
+        <div class="panel-heading">
+          <div><p class="eyebrow">MODEL CLASSROOM</p><h2>모델은 어떻게 계산하고 결론을 내리나요?</h2></div>
+          <span class="method-badge">계산 → 해석 → 한계</span>
+        </div>
+        <div class="model-tabs" role="tablist" aria-label="모델 설명 선택">
+          <button type="button" class="active" data-model-lesson="random_forest">Random Forest</button>
+          <button type="button" data-model-lesson="xgboost">XGBoost</button>
+          <button type="button" data-model-lesson="hierarchical">계층형 Logistic</button>
+          <button type="button" data-model-lesson="ensemble">모델 평균</button>
+        </div>
+        <div id="model-lesson" class="model-lesson" aria-live="polite"></div>
+      </section>
+
+      <section class="uncertainty-grid" id="uncertainty">
+        <article class="panel uncertainty-summary">
+          <div class="panel-heading"><div><p class="eyebrow">UNCERTAINTY LENS</p><h2>예측 가능성 점검</h2></div><strong id="uncertainty-level">분석 중</strong></div>
+          <div id="uncertainty-analysis" class="uncertainty-analysis"></div>
+        </article>
+        <article class="panel risk-dictionary">
+          <div class="panel-heading"><div><p class="eyebrow">RISK DICTIONARY</p><h2>모델 밖의 위험</h2></div></div>
+          <details open><summary>블랙스완 <span>예측하기 어려운 충격</span></summary><p>팬데믹이나 갑작스러운 금융 붕괴처럼 과거 자료에 유사 사례가 거의 없는 사건입니다. 모델이 발생 자체를 예측한다고 볼 수 없습니다.</p></details>
+          <details><summary>그레이 라이노 <span>알려졌지만 방치되는 위험</span></summary><p>가계부채, 부동산 부실, 장기 고금리처럼 위험은 보이지만 발생 시점과 충격 크기가 불확실한 문제입니다.</p></details>
+          <details><summary>구조 변화 <span>과거 관계의 변화</span></summary><p>팬데믹 전후처럼 물가·환율·금리의 관계가 달라지면 과거 패턴에 의존한 모델의 정확도가 낮아질 수 있습니다.</p></details>
+        </article>
+      </section>
+
+      <section class="panel model-limitations" id="model-limitations">
+        <header class="limitations-heading">
+          <p class="eyebrow">MODEL INSIGHT</p>
+          <h2>AI 모델의 한계와 경제적 리스크</h2>
+          <p>AI는 과거 데이터를 기반으로 미래를 예측합니다. 하지만 모든 경제 상황을 완벽하게 예측할 수는 없습니다.</p>
+        </header>
+
+        <div class="risk-card-grid">
+          <article class="insight-card limitation-card black-swan-card">
+            <header><span class="risk-type">BLACK SWAN</span><h3>예측하기 어려운 돌발 충격</h3></header>
+            <p>블랙 스완은 과거 데이터에서는 거의 관측되지 않았지만 발생하면 금융시장과 경제에 매우 큰 영향을 주는 사건입니다.</p>
+            <ul class="risk-examples"><li>팬데믹</li><li>전쟁</li><li>금융 시스템 붕괴</li><li>대규모 자연재해</li><li>갑작스러운 지정학적 충돌</li></ul>
+            <p>이러한 사건은 기존 경제 패턴을 크게 변화시키기 때문에 머신러닝 모델의 예측 정확도가 낮아질 수 있습니다.</p>
+            <div class="model-response"><h4>AI 모델에서는 어떻게 대응할까?</h4><div class="response-tags"><span>Stress Test</span><span>Extreme Scenario Analysis</span><span>Prediction Confidence</span><span>Uncertainty Warning</span><span>Rule-based Override</span></div><p>AI는 블랙 스완을 정확하게 예측하기보다, 충격이 발생했을 때 모델이 얼마나 안정적으로 동작하는지를 고려하는 것이 중요합니다.</p></div>
+            <details class="learn-more"><summary>Learn More <span>상세 내용 펼치기</span></summary><div class="learn-more-content">
+              <section><h4>왜 예측하기 어려운가?</h4><p>학습 데이터에 유사한 사례가 거의 없어 모델이 안정적인 패턴과 확률을 추정할 근거가 부족합니다.</p></section>
+              <section><h4>AI가 틀릴 수 있는 이유</h4><p>기존 변수 사이의 관계가 충격 직후 급격히 바뀌고, 과거에 유효했던 규칙이 더 이상 작동하지 않을 수 있습니다.</p></section>
+              <section><h4>실제 사례</h4><p>코로나19 초기에는 이동 제한, 공급망 중단과 대규모 정책 대응이 동시에 발생해 일반적인 경기·물가 관계가 크게 달라졌습니다.</p></section>
+              <section><h4>모델 개선 방향</h4><p>극단 시나리오 스트레스 테스트, 이상치 감지, 확률 신뢰구간, 전문가 규칙과 비상 중단 장치를 함께 사용합니다.</p></section>
+            </div></details>
+          </article>
+
+          <article class="insight-card limitation-card gray-rhino-card">
+            <header><span class="risk-type">GRAY RHINO</span><h3>알고 있지만 대응하지 않은 위험</h3></header>
+            <p>그레이 라이노는 이미 위험이 알려져 있고 데이터로 관측 가능하지만, 대응이 늦어질 경우 큰 경제 충격으로 이어질 수 있는 위험입니다.</p>
+            <ul class="risk-examples"><li>가계부채 증가</li><li>부동산 가격 과열</li><li>기업부채 증가</li><li>금융시장 변동성 확대</li><li>인구구조 변화</li><li>경기 둔화</li></ul>
+            <p>이러한 변수들은 데이터로 관측 가능하기 때문에 AI 모델에 직접 반영할 수 있습니다.</p>
+            <div class="model-response"><h4>AI 모델에서는 어떻게 활용할까?</h4><div class="response-tags"><span>Household Debt</span><span>Housing Price Index</span><span>Corporate Debt</span><span>Delinquency Rate</span><span>Market Volatility</span><span>Demographic Change</span></div><p>이러한 변수들은 머신러닝 모델의 입력 변수로 활용될 수 있으며, 기준금리 예측 정확도를 향상시키는 데 도움을 줄 수 있습니다.</p></div>
+            <details class="learn-more"><summary>Learn More <span>상세 내용 펼치기</span></summary><div class="learn-more-content">
+              <section><h4>왜 예측 가능한가?</h4><p>위험이 누적되는 과정이 부채비율, 가격지수, 연체율과 변동성 같은 시계열 데이터에 지속적으로 나타납니다.</p></section>
+              <section><h4>어떤 Feature를 사용할 수 있는가?</h4><p>가계·기업 신용 증가율, 주택가격지수, 소득 대비 부채비율, 연체율, 신용 스프레드와 시장 변동성을 활용할 수 있습니다.</p></section>
+              <section><h4>실제 금융기관에서는 어떻게 활용하는가?</h4><p>조기경보지표, 신용위험 모니터링, 포트폴리오 스트레스 테스트와 거시건전성 시나리오 분석에 활용합니다.</p></section>
+              <section><h4>모델 개선 방향</h4><p>관련 지표를 시차 변수로 추가하고 임계 수준, 증가 속도와 지표 간 상호작용을 함께 학습합니다.</p></section>
+            </div></details>
+          </article>
+        </div>
+
+        <div class="risk-comparison" aria-label="블랙 스완과 그레이 라이노 비교">
+          <div><strong>Black Swan</strong><span>과거 데이터에 존재하지 않을 가능성이 높음</span><b>예측보다 대응이 중요</b></div>
+          <i aria-hidden="true">VS</i>
+          <div><strong>Gray Rhino</strong><span>위험 신호가 데이터에 존재함</span><b>적절한 Feature를 추가하면 학습 가능</b></div>
+        </div>
+
+        <aside class="model-scope">
+          <span>MODEL SCOPE</span><h3>본 모델이 분석할 수 있는 범위</h3>
+          <p>본 모델은 과거 경제지표의 패턴을 기반으로 기준금리 방향을 예측합니다. 따라서 팬데믹, 전쟁과 같은 블랙 스완 사건에서는 예측력이 낮아질 수 있습니다.</p>
+          <p>반면 가계부채, 부동산 과열, 경기 둔화와 같은 그레이 라이노 위험은 관련 경제지표를 Feature로 추가함으로써 일정 부분 모델에 반영할 수 있습니다.</p>
+          <strong>즉, 본 모델은 예측 가능한 경제 리스크를 분석하는 데 강점이 있으며, 예측하기 어려운 돌발 사건에 대해서는 한계를 가질 수 있습니다.</strong>
+        </aside>
+      </section>
+
+      <section class="explanation-grid" id="methodology">
+        <article class="panel methodology-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">METHODOLOGY</p>
+              <h2>RateScope는 이렇게 분석합니다</h2>
+            </div>
+          </div>
+          <ol class="method-steps">
+            <li>
+              <span>01</span>
+              <div>
+                <strong>공식 경제지표 수집</strong>
+                <p>한국은행 ECOS와 FRED에서 기준금리, 물가, 환율, 실업률, 국고채와 미국 금리를 수집합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>02</span>
+              <div>
+                <strong>변화와 금리차 계산</strong>
+                <p>1·3·6개월 변화율, 한미 금리 차, 국고채–기준금리 차와 최근 금리 방향을 만듭니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>03</span>
+              <div>
+                <strong>미래 정보 차단</strong>
+                <p>TimeSeriesSplit과 3개월 gap을 적용해 미래 정답이 과거 학습에 들어가지 않게 합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>04</span>
+              <div>
+                <strong>두 머신러닝 모델 비교</strong>
+                <p>Random Forest와 XGBoost 설정을 Macro F1 기준으로 조정하고 Baseline과 비교합니다.</p>
+              </div>
+            </li>
+            <li>
+              <span>05</span>
+              <div>
+                <strong>3개월 방향 확률 산출</strong>
+                <p>각 모델이 인하·동결·인상 점수를 출력하고 두 모델을 동일 비중으로 평균합니다.</p>
+              </div>
+            </li>
+          </ol>
+        </article>
+
+        <article class="panel interpretation-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">INTERPRETATION</p>
+              <h2>현재 분석 결과</h2>
+            </div>
+          </div>
+          <div id="analysis-summary" class="analysis-summary">
+            결과를 해석하고 있습니다.
+          </div>
+          <dl id="analysis-details" class="analysis-details"></dl>
+          <div class="confidence-box">
+            <span>모델 신뢰도</span>
+            <strong id="confidence-label">검토 중</strong>
+            <p id="confidence-reason"></p>
+          </div>
+        </article>
+      </section>
+
+      <section class="panel variable-guide" id="variables">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">FEATURE DICTIONARY</p>
+            <h2>모델에는 어떤 변수를 넣었나요?</h2>
+          </div>
+          <span class="method-badge">입력 변수 19개 · 목표값 1개</span>
+        </div>
+        <p class="guide-intro">
+          현재 수치만 넣지 않고 최근 변화 속도와 지표 사이의 차이도 함께
+          입력했습니다. 아래 해석은 일반적인 경제적 방향이며, 항상 같은
+          금리 결정으로 이어진다는 의미는 아닙니다.
+        </p>
+
+        <div class="variable-groups">
+          <details open>
+            <summary>
+              <span>기본 경제지표</span>
+              <small>6개 변수</small>
+            </summary>
+            <div class="variable-table-wrap">
+              <table class="variable-table">
+                <thead>
+                  <tr><th>변수</th><th>의미</th><th>일반적 해석</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th>현재 기준금리</th><td>예측 시점의 한국은행 기준금리</td><td>향후 금리 수준을 결정하는 출발점</td></tr>
+                  <tr><th>물가상승률</th><td>소비자물가지수 전년 동월 대비 상승률</td><td>물가 압력이 높으면 인하가 어려울 수 있음</td></tr>
+                  <tr><th>원·달러 환율</th><td>월평균 원화의 달러 대비 환율</td><td>원화 약세가 심하면 인하 부담이 커질 수 있음</td></tr>
+                  <tr><th>실업률</th><td>월별 국내 실업률</td><td>고용 악화는 인하 필요성을 높일 수 있음</td></tr>
+                  <tr><th>국고채 3년물</th><td>시장 참여자의 중기 금리 기대가 반영된 채권금리</td><td>정책금리보다 먼저 움직이는 시장 신호로 활용</td></tr>
+                  <tr><th>미국 기준금리</th><td>미국 연방기금금리 월평균</td><td>한미 금리 차와 환율 여건을 통해 국내 결정에 영향</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span>최근 변화 변수</span>
+              <small>9개 변수</small>
+            </summary>
+            <div class="variable-table-wrap">
+              <table class="variable-table">
+                <thead>
+                  <tr><th>변수</th><th>계산법</th><th>알 수 있는 것</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th>물가 1·3·6개월 변화</th><td>현재 물가상승률 − 과거 물가상승률</td><td>물가가 가속하는지 둔화하는지 측정</td></tr>
+                  <tr><th>환율 1·3·6개월 변화율</th><td>(현재 환율 ÷ 과거 환율 − 1) × 100</td><td>원화 약세·강세의 속도를 측정</td></tr>
+                  <tr><th>국고채 1·3·6개월 변화</th><td>현재 3년물 금리 − 과거 3년물 금리</td><td>시장의 금리 기대가 어느 방향으로 변했는지 측정</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span>금리차와 최근 정책 방향</span>
+              <small>4개 변수</small>
+            </summary>
+            <div class="variable-table-wrap">
+              <table class="variable-table">
+                <thead>
+                  <tr><th>변수</th><th>계산법</th><th>알 수 있는 것</th></tr>
+                </thead>
+                <tbody>
+                  <tr><th>한미 기준금리 차</th><td>한국 기준금리 − 미국 기준금리</td><td>금리 격차와 외환시장 부담을 표현</td></tr>
+                  <tr><th>국고채–기준금리 차</th><td>국고채 3년물 − 한국 기준금리</td><td>시장이 예상하는 향후 정책 방향의 단서</td></tr>
+                  <tr><th>최근 3개월 금리 변화량</th><td>현재 기준금리 − 3개월 전 기준금리</td><td>최근 정책 변화의 크기를 표현</td></tr>
+                  <tr><th>최근 3개월 금리 방향</th><td>인하 −1 · 동결 0 · 인상 +1</td><td>최근 정책의 진행 방향을 숫자로 입력</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </details>
+
+          <details>
+            <summary>
+              <span>모델이 맞히려는 목표값</span>
+              <small>3개월 뒤 방향</small>
+            </summary>
+            <div class="target-definition">
+              <code>3개월 뒤 기준금리 − 현재 기준금리</code>
+              <div>
+                <span><i class="cut"></i>음수 → 인하</span>
+                <span><i class="hold"></i>0 → 동결</span>
+                <span><i class="hike"></i>양수 → 인상</span>
+              </div>
+              <p>
+                Random Forest와 XGBoost는 금리 숫자를 직접 맞히는 것이 아니라
+                세 방향 중 하나를 분류하고 각 방향의 점수를 반환합니다.
+              </p>
+            </div>
+          </details>
+        </div>
+      </section>
+
+      <section class="panel reliability-lab">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">RELIABILITY LAB</p>
+            <h2>신뢰도를 높이기 위한 데이터 설계 실험</h2>
+          </div>
+          <span id="reliability-status" class="method-badge">불러오는 중</span>
+        </div>
+        <div class="reliability-layout">
+          <div class="design-flow">
+            <button type="button" class="active" data-reliability-step="history"><span>01</span><strong>2008년 이후로 확대</strong><small>더 많은 금리 국면 학습</small></button>
+            <i>→</i>
+            <button type="button" data-reliability-step="weight"><span>02</span><strong>최근 자료 가중</strong><small>60개월마다 과거 비중 절반</small></button>
+            <i>→</i>
+            <button type="button" data-reliability-step="hierarchy"><span>03</span><strong>2단계 분류</strong><small>변경/동결 → 인하/인상</small></button>
+            <i>→</i>
+            <button type="button" data-reliability-step="nested"><span>04</span><strong>중첩 시계열 검증</strong><small>설정 선택과 외부 평가 분리</small></button>
+          </div>
+          <div id="reliability-result" class="reliability-result"></div>
+        </div>
+        <div id="reliability-detail" class="reliability-detail" aria-live="polite"></div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>모델</th>
+                <th>정확도</th>
+                <th>Macro F1</th>
+                <th>Brier Score</th>
+                <th>인하 탐지율</th>
+                <th>동결 탐지율</th>
+                <th>인상 탐지율</th>
+              </tr>
+            </thead>
+            <tbody id="reliability-metrics"></tbody>
+          </table>
+        </div>
+        <p class="reliability-note">
+          Brier Score는 확률 예측 오차로 낮을수록 좋습니다. 한 지표만
+          개선됐다고 신뢰도가 충분하다고 판단하지 않습니다.
+        </p>
+      </section>
+
+      <section class="panel my-insight" id="insight">
+        <header class="insight-hero">
+          <p class="eyebrow">MY INSIGHT</p>
+          <h2>AI는 경제를 예측하지만,<br />중앙은행은 정책을 결정합니다</h2>
+          <p class="insight-lead">AI는 과거 데이터를 기반으로 미래를 예측하지만, 중앙은행은 미래의 위험까지 고려하여 정책을 결정합니다.</p>
+        </header>
+
+        <article class="insight-narrative">
+          <span class="insight-number">01</span>
+          <div>
+            <p class="eyebrow">CORE INSIGHT</p>
+            <h3>프로젝트를 통해 얻은 핵심 인사이트</h3>
+            <div class="insight-copy">
+              <p>처음에는 기준금리 역시 경제지표를 충분히 학습하면 높은 정확도로 예측할 수 있을 것이라고 생각했습니다. 그러나 모델의 예측 결과와 실제 한국은행의 기준금리 결정을 비교하면서, 경제지표만으로는 정책 결정을 완전히 설명하기 어렵다는 점을 확인했습니다.</p>
+              <p>물가, 성장률, 실업률과 같은 정량적 지표는 기준금리 결정의 중요한 근거입니다. 하지만 실제 정책에는 환율, 가계부채, 부동산시장, 금융시장 안정, 글로벌 경제 환경, 금융통화위원회의 판단과 같은 요소도 함께 반영됩니다.</p>
+              <p>AI는 과거에 관측된 데이터와 패턴을 기반으로 가장 가능성이 높은 결과를 예측합니다. 반면 중앙은행은 현재의 경제 상황뿐 아니라 앞으로 발생할 수 있는 위험과 정책의 파급효과까지 고려하여 결정을 내립니다.</p>
+            </div>
+          </div>
+        </article>
+
+        <div class="insight-block">
+          <div class="insight-section-heading"><span class="insight-number">02</span><div><p class="eyebrow">TWO PERSPECTIVES</p><h3>AI 판단과 중앙은행 판단 비교</h3></div></div>
+          <div class="judgment-comparison">
+            <article class="insight-card ai-card">
+              <span class="card-label">DATA-DRIVEN FORECAST</span><h4>AI의 판단</h4>
+              <ul><li>과거 경제지표의 패턴 학습</li><li>경기 둔화 시 금리 인하 가능성 증가</li><li>물가, 성장률, 실업률 등 정량 데이터 중심</li><li>데이터에 포함된 관계를 기반으로 확률 계산</li></ul>
+              <blockquote>과거에는 이러한 경제 상황에서 금리 인하가 자주 나타났습니다.</blockquote>
+            </article>
+            <div class="versus" aria-hidden="true"><span>VS</span><i></i></div>
+            <article class="insight-card bank-card">
+              <span class="card-label">POLICY DECISION</span><h4>중앙은행의 판단</h4>
+              <ul><li>물가와 경기 상황을 종합적으로 평가</li><li>환율과 가계부채 등 금융안정 위험 고려</li><li>글로벌 경제와 시장 반응 반영</li><li>정책위원의 판단과 미래 위험까지 고려</li></ul>
+              <blockquote>정책 결정은 단순한 예측이 아니라 여러 위험 사이의 선택입니다.</blockquote>
+            </article>
+          </div>
+        </div>
+
+        <article class="explainability-callout">
+          <span class="insight-number">03</span>
+          <div><p class="eyebrow">BEYOND ACCURACY</p><h3>예측을 맞히는 것보다, 왜 그렇게 예측했는지를 설명하는 것이 중요합니다</h3>
+            <p>이 프로젝트를 진행하며 모델의 정확도만큼 중요한 것은 예측의 근거와 실패 원인을 설명하는 능력이라는 점을 배웠습니다. 금융기관에서는 단순히 상승, 동결, 인하 결과만 확인하는 것이 아니라 어떤 경제지표가 판단에 영향을 주었는지, 실제 결과와 차이가 발생한 이유는 무엇인지 함께 분석해야 합니다.</p>
+            <p>따라서 본 프로젝트는 예측 결과뿐 아니라 변수 중요도, 모델 신뢰도, 실제 정책 결정과의 차이를 함께 제공하는 의사결정 지원 시스템을 지향합니다.</p>
+          </div>
+        </article>
+
+        <div class="insight-block">
+          <div class="insight-section-heading"><span class="insight-number">04</span><div><p class="eyebrow">ERROR ANALYSIS</p><h3>모델이 틀릴 수 있는 이유</h3></div></div>
+          <div class="error-reason-grid">
+            <article class="insight-card"><span>01</span><h4>정책 판단</h4><p>중앙은행은 데이터만으로 표현하기 어려운 정책적 우선순위를 고려합니다.</p></article>
+            <article class="insight-card"><span>02</span><h4>예외적 충격</h4><p>팬데믹, 전쟁, 금융위기와 같은 사건은 과거의 일반적인 패턴을 무너뜨릴 수 있습니다.</p></article>
+            <article class="insight-card"><span>03</span><h4>누락된 정보</h4><p>중앙은행 발언, 금융통화위원회 의사록, 시장 기대와 같은 비정형 정보가 모델에 포함되지 않았을 수 있습니다.</p></article>
+          </div>
+        </div>
+
+        <div class="insight-block future-direction">
+          <div class="insight-section-heading"><span class="insight-number">05</span><div><p class="eyebrow">NEXT EVOLUTION</p><h3>앞으로의 발전 방향</h3></div></div>
+          <ol class="insight-roadmap">
+            <li><span>01</span><div><strong>정형 경제지표 기반 예측</strong><p>물가, 성장률, 실업률, 환율 등 경제지표를 활용해 기준금리 방향을 예측합니다.</p></div></li>
+            <li><span>02</span><div><strong>예측 근거 설명</strong><p>Feature Importance 또는 SHAP 등을 활용해 어떤 변수가 예측에 영향을 주었는지 설명합니다.</p></div></li>
+            <li><span>03</span><div><strong>비정형 데이터 결합</strong><p>한국은행 총재 발언, 금융통화위원회 의사록, 경제 뉴스와 시장 심리를 분석에 추가합니다.</p></div></li>
+            <li><span>04</span><div><strong>금융 의사결정 지원 시스템</strong><p>예측값만 제공하는 것이 아니라 예측 근거, 불확실성, 위험요인을 함께 제시하는 시스템으로 발전시킵니다.</p></div></li>
+          </ol>
+        </div>
+      </section>
+
+      <section class="notice">
+        <strong>읽기 전에 꼭 확인하세요.</strong>
+        <p>
+          포스트 팬데믹 표본이 적고 검증 구간에 인상 사례가 없기 때문에
+          예측 확률과 변수 중요도는 불안정할 수 있습니다. 본 서비스는
+          머신러닝 학습용이며 금융 또는 투자 조언이 아닙니다.
+        </p>
+      </section>
+    </main>
+
+    <button id="glossary-open" class="glossary-fab" type="button">용어 사전 <span>?</span></button>
+    <dialog id="glossary-dialog" class="glossary-dialog">
+      <div class="dialog-heading"><div><p class="eyebrow">QUICK GUIDE</p><h2>금리 전망 용어 사전</h2></div><button id="glossary-close" type="button" aria-label="닫기">×</button></div>
+      <div class="glossary-list">
+        <div><strong>기준금리</strong><p>한국은행이 물가와 경기를 고려해 정하는 정책금리입니다.</p></div>
+        <div><strong>Macro F1</strong><p>인하·동결·인상을 같은 비중으로 평가하는 지표입니다. 1에 가까울수록 좋습니다.</p></div>
+        <div><strong>Brier Score</strong><p>확률 예측과 실제 결과의 차이입니다. 0에 가까울수록 좋습니다.</p></div>
+        <div><strong>Baseline</strong><p>복잡한 모델이 정말 나은지 비교하기 위한 단순 기준 전략입니다.</p></div>
+        <div><strong>TimeSeriesSplit</strong><p>과거로 학습하고 그보다 미래인 구간으로 검증하는 시계열 평가법입니다.</p></div>
+        <div><strong>금리 스프레드</strong><p>두 금리의 차이로, 시장 기대나 국가 간 정책 여건을 보여줍니다.</p></div>
+      </div>
+    </dialog>
+
+    <footer>
+      <span>RateScope · FastAPI + ECOS + FRED</span>
+      <span id="footer-period"></span>
+    </footer>
+    <script src="/static/app.js?v=20260804-6" defer></script>
+    <script src="/static/prediction_history.js?v=20260804-1" defer></script>
+    <script src="/static/shared.js?v=20260804-1" defer></script>
+  </body>
+</html>
