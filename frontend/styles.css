@@ -6,7 +6,7 @@
   --ink: #f1f5ef;
   --muted: #929a94;
   --line: #29302b;
-  --lime: #cfff5a;
+  --lime: #68a9a1;
   --blue: #63a6ff;
   --red: #ff705d;
   --orange: #ffc45d;
@@ -617,7 +617,7 @@ body.drawer-open { overflow: hidden; }.prediction-detail { position: fixed; inse
 
 :root[data-theme="light"] {
   color-scheme: light; --bg: #f3f5f0; --panel: #fff; --panel-2: #f7f8f5;
-  --ink: #111510; --muted: #687068; --line: #dce1d9;
+  --ink: #111510; --muted: #687068; --line: #dce1d9; --lime: #236b65;
 }
 :root[data-theme="light"] .topbar { background: rgb(243 245 240 / 88%); }
 :root[data-theme="light"] .track { background: #e5e9e3; }
