@@ -1,0 +1,1468 @@
+{
+  "configuration": {
+    "method": "expanding TimeSeriesSplit",
+    "n_splits": 4,
+    "test_size_months": 6,
+    "gap_months": 3,
+    "forecast_horizon_months": 3,
+    "labels": [
+      "인하",
+      "동결",
+      "인상"
+    ],
+    "tolerance": 1e-08,
+    "features": [
+      "current_rate",
+      "inflation",
+      "exchange_rate",
+      "unemployment",
+      "bond_3y",
+      "us_policy_rate",
+      "inflation_change_1m",
+      "inflation_change_3m",
+      "inflation_change_6m",
+      "exchange_rate_change_1m_pct",
+      "exchange_rate_change_3m_pct",
+      "exchange_rate_change_6m_pct",
+      "bond_3y_change_1m",
+      "bond_3y_change_3m",
+      "bond_3y_change_6m",
+      "korea_us_rate_spread",
+      "bond_policy_spread",
+      "rate_change_3m",
+      "rate_direction_3m"
+    ]
+  },
+  "target_audit": {
+    "rows": 51,
+    "last_three_raw_rows_excluded": [
+      "2026-04",
+      "2026-05",
+      "2026-06"
+    ],
+    "all_target_dates_exactly_three_months": true,
+    "exact_vs_tolerant_label_disagreements": 0
+  },
+  "class_mapping": {
+    "canonical_labels": [
+      "인하",
+      "동결",
+      "인상"
+    ],
+    "frontend_order": [
+      "인하",
+      "동결",
+      "인상"
+    ],
+    "xgboost_encoding": {
+      "인하": 0,
+      "동결": 1,
+      "인상": 2
+    },
+    "note": "각 fold의 XGBoost 인코더는 해당 학습 fold에 존재하는 정렬 클래스만 연속 정수로 다시 매핑함"
+  },
+  "preprocessing_audit": {
+    "scaler": "사용하지 않음",
+    "imputer": "사용하지 않음",
+    "feature_selector": "사용하지 않음",
+    "feature_nan_count": 0,
+    "rolling_features": "현재와 1·3·6개월 과거값만 사용",
+    "future_fill": "사용하지 않음"
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "train_period": [
+        "2022-01",
+        "2023-12"
+      ],
+      "gap_period": [
+        "2024-01",
+        "2024-03"
+      ],
+      "test_period": [
+        "2024-04",
+        "2024-09"
+      ],
+      "train_samples": 24,
+      "test_samples": 6,
+      "train_distribution": {
+        "인상": 12,
+        "동결": 12
+      },
+      "test_distribution": {
+        "동결": 3,
+        "인하": 3
+      },
+      "index_alignment": {
+        "x_test_indices": [
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "y_test_indices": [
+          27,
+          28,
+          29,
+          30,
+          31,
+          32
+        ],
+        "dates_sorted": true
+      },
+      "models": {
+        "random_forest": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5,
+          "macro_f1": 0.2222222222222222,
+          "confusion_matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          },
+          "prediction_distribution": {
+            "동결": 6
+          },
+          "model_classes": [
+            "동결",
+            "인상"
+          ],
+          "matches_displayed_metrics": true,
+          "below_baselines": []
+        },
+        "xgboost": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5,
+          "macro_f1": 0.2222222222222222,
+          "confusion_matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          },
+          "prediction_distribution": {
+            "동결": 6
+          },
+          "encoder_classes": [
+            "동결",
+            "인상"
+          ],
+          "model_classes": [
+            0,
+            1
+          ],
+          "matches_displayed_metrics": true,
+          "below_baselines": []
+        }
+      },
+      "baselines": {
+        "always_hold": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5,
+          "macro_f1": 0.2222222222222222,
+          "confusion_matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          }
+        },
+        "previous_direction": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5,
+          "macro_f1": 0.2222222222222222,
+          "confusion_matrix": [
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              3,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          }
+        },
+        "train_majority": {
+          "correct": 0,
+          "total": 6,
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              3
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 0.0,
+            "인상": 0.0
+          }
+        }
+      },
+      "rows": [
+        {
+          "feature_date": "2024-04",
+          "target_date": "2024-07",
+          "current_rate": 3.5,
+          "future_rate": 3.5,
+          "y_true": "동결",
+          "rf_pred": "동결",
+          "xgb_pred": "동결",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.9782619047619049,
+            "인상": 0.021738095238095237
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7693783044815063,
+            "인상": 0.23062172532081604
+          }
+        },
+        {
+          "feature_date": "2024-05",
+          "target_date": "2024-08",
+          "current_rate": 3.5,
+          "future_rate": 3.5,
+          "y_true": "동결",
+          "rf_pred": "동결",
+          "xgb_pred": "동결",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.9569841269841269,
+            "인상": 0.043015873015873014
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7693783044815063,
+            "인상": 0.23062172532081604
+          }
+        },
+        {
+          "feature_date": "2024-06",
+          "target_date": "2024-09",
+          "current_rate": 3.5,
+          "future_rate": 3.5,
+          "y_true": "동결",
+          "rf_pred": "동결",
+          "xgb_pred": "동결",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.9460000000000002,
+            "인상": 0.053999999999999986
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7693783044815063,
+            "인상": 0.23062172532081604
+          }
+        },
+        {
+          "feature_date": "2024-07",
+          "target_date": "2024-10",
+          "current_rate": 3.5,
+          "future_rate": 3.25,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "동결",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.9326666666666669,
+            "인상": 0.06733333333333333
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7693783044815063,
+            "인상": 0.23062172532081604
+          }
+        },
+        {
+          "feature_date": "2024-08",
+          "target_date": "2024-11",
+          "current_rate": 3.5,
+          "future_rate": 3.0,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "동결",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.9696111111111111,
+            "인상": 0.03038888888888889
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7693783044815063,
+            "인상": 0.23062172532081604
+          }
+        },
+        {
+          "feature_date": "2024-09",
+          "target_date": "2024-12",
+          "current_rate": 3.5,
+          "future_rate": 3.0,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "동결",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.977388888888889,
+            "인상": 0.022611111111111113
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7693783044815063,
+            "인상": 0.23062172532081604
+          }
+        }
+      ]
+    },
+    {
+      "fold": 2,
+      "train_period": [
+        "2022-01",
+        "2024-06"
+      ],
+      "gap_period": [
+        "2024-07",
+        "2024-09"
+      ],
+      "test_period": [
+        "2024-10",
+        "2025-03"
+      ],
+      "train_samples": 30,
+      "test_samples": 6,
+      "train_distribution": {
+        "인상": 12,
+        "동결": 18
+      },
+      "test_distribution": {
+        "인하": 6
+      },
+      "index_alignment": {
+        "x_test_indices": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "y_test_indices": [
+          33,
+          34,
+          35,
+          36,
+          37,
+          38
+        ],
+        "dates_sorted": true
+      },
+      "models": {
+        "random_forest": {
+          "correct": 0,
+          "total": 6,
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
+          "confusion_matrix": [
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 0.0,
+            "인상": 0.0
+          },
+          "prediction_distribution": {
+            "동결": 6
+          },
+          "model_classes": [
+            "동결",
+            "인상"
+          ],
+          "matches_displayed_metrics": true,
+          "below_baselines": [
+            "previous_direction"
+          ]
+        },
+        "xgboost": {
+          "correct": 0,
+          "total": 6,
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              6
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 0.0,
+            "인상": 0.0
+          },
+          "prediction_distribution": {
+            "인상": 6
+          },
+          "encoder_classes": [
+            "동결",
+            "인상"
+          ],
+          "model_classes": [
+            0,
+            1
+          ],
+          "matches_displayed_metrics": true,
+          "below_baselines": [
+            "previous_direction"
+          ]
+        }
+      },
+      "baselines": {
+        "always_hold": {
+          "correct": 0,
+          "total": 6,
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
+          "confusion_matrix": [
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 0.0,
+            "인상": 0.0
+          }
+        },
+        "previous_direction": {
+          "correct": 6,
+          "total": 6,
+          "accuracy": 1.0,
+          "macro_f1": 0.3333333333333333,
+          "confusion_matrix": [
+            [
+              6,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 1.0,
+            "동결": 0.0,
+            "인상": 0.0
+          }
+        },
+        "train_majority": {
+          "correct": 0,
+          "total": 6,
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
+          "confusion_matrix": [
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 0.0,
+            "인상": 0.0
+          }
+        }
+      },
+      "rows": [
+        {
+          "feature_date": "2024-10",
+          "target_date": "2025-01",
+          "current_rate": 3.25,
+          "future_rate": 3.0,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7560261437908496,
+            "인상": 0.24397385620915032
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.4760187268257141,
+            "인상": 0.5239812731742859
+          }
+        },
+        {
+          "feature_date": "2024-11",
+          "target_date": "2025-02",
+          "current_rate": 3.0,
+          "future_rate": 2.75,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7501372549019608,
+            "인상": 0.24986274509803924
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.4504183530807495,
+            "인상": 0.5495816469192505
+          }
+        },
+        {
+          "feature_date": "2024-12",
+          "target_date": "2025-03",
+          "current_rate": 3.0,
+          "future_rate": 2.75,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.7229150326797386,
+            "인상": 0.27708496732026144
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.40887510776519775,
+            "인상": 0.5911248922348022
+          }
+        },
+        {
+          "feature_date": "2025-01",
+          "target_date": "2025-04",
+          "current_rate": 3.0,
+          "future_rate": 2.75,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.6932483660130718,
+            "인상": 0.3067516339869281
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.40887510776519775,
+            "인상": 0.5911248922348022
+          }
+        },
+        {
+          "feature_date": "2025-02",
+          "target_date": "2025-05",
+          "current_rate": 2.75,
+          "future_rate": 2.5,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.6971372549019609,
+            "인상": 0.30286274509803923
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.40887510776519775,
+            "인상": 0.5911248922348022
+          }
+        },
+        {
+          "feature_date": "2025-03",
+          "target_date": "2025-06",
+          "current_rate": 2.75,
+          "future_rate": 2.5,
+          "y_true": "인하",
+          "rf_pred": "동결",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.0,
+            "동결": 0.683470588235294,
+            "인상": 0.3165294117647059
+          },
+          "xgb_probabilities": {
+            "인하": 0.0,
+            "동결": 0.40887510776519775,
+            "인상": 0.5911248922348022
+          }
+        }
+      ]
+    },
+    {
+      "fold": 3,
+      "train_period": [
+        "2022-01",
+        "2024-12"
+      ],
+      "gap_period": [
+        "2025-01",
+        "2025-03"
+      ],
+      "test_period": [
+        "2025-04",
+        "2025-09"
+      ],
+      "train_samples": 36,
+      "test_samples": 6,
+      "train_distribution": {
+        "인상": 12,
+        "동결": 18,
+        "인하": 6
+      },
+      "test_distribution": {
+        "인하": 1,
+        "동결": 5
+      },
+      "index_alignment": {
+        "x_test_indices": [
+          39,
+          40,
+          41,
+          42,
+          43,
+          44
+        ],
+        "y_test_indices": [
+          39,
+          40,
+          41,
+          42,
+          43,
+          44
+        ],
+        "dates_sorted": true
+      },
+      "models": {
+        "random_forest": {
+          "correct": 1,
+          "total": 6,
+          "accuracy": 0.16666666666666666,
+          "macro_f1": 0.09523809523809523,
+          "confusion_matrix": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              5,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 1.0,
+            "동결": 0.0,
+            "인상": 0.0
+          },
+          "prediction_distribution": {
+            "인하": 6
+          },
+          "model_classes": [
+            "동결",
+            "인상",
+            "인하"
+          ],
+          "matches_displayed_metrics": true,
+          "below_baselines": [
+            "always_hold",
+            "previous_direction",
+            "train_majority"
+          ]
+        },
+        "xgboost": {
+          "correct": 1,
+          "total": 6,
+          "accuracy": 0.16666666666666666,
+          "macro_f1": 0.1111111111111111,
+          "confusion_matrix": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              4,
+              0,
+              1
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 1.0,
+            "동결": 0.0,
+            "인상": 0.0
+          },
+          "prediction_distribution": {
+            "인하": 5,
+            "인상": 1
+          },
+          "encoder_classes": [
+            "동결",
+            "인상",
+            "인하"
+          ],
+          "model_classes": [
+            0,
+            1,
+            2
+          ],
+          "matches_displayed_metrics": true,
+          "below_baselines": [
+            "always_hold",
+            "previous_direction",
+            "train_majority"
+          ]
+        }
+      },
+      "baselines": {
+        "always_hold": {
+          "correct": 5,
+          "total": 6,
+          "accuracy": 0.8333333333333334,
+          "macro_f1": 0.30303030303030304,
+          "confusion_matrix": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          }
+        },
+        "previous_direction": {
+          "correct": 3,
+          "total": 6,
+          "accuracy": 0.5,
+          "macro_f1": 0.3238095238095238,
+          "confusion_matrix": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              3,
+              2,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 1.0,
+            "동결": 0.4,
+            "인상": 0.0
+          }
+        },
+        "train_majority": {
+          "correct": 5,
+          "total": 6,
+          "accuracy": 0.8333333333333334,
+          "macro_f1": 0.30303030303030304,
+          "confusion_matrix": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              5,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          }
+        }
+      },
+      "rows": [
+        {
+          "feature_date": "2025-04",
+          "target_date": "2025-07",
+          "current_rate": 2.75,
+          "future_rate": 2.5,
+          "y_true": "인하",
+          "rf_pred": "인하",
+          "xgb_pred": "인하",
+          "rf_probabilities": {
+            "인하": 0.8169696899534362,
+            "동결": 0.07848818550443937,
+            "인상": 0.10454212454212454
+          },
+          "xgb_probabilities": {
+            "인하": 0.9038516879081726,
+            "동결": 0.0410616435110569,
+            "인상": 0.055086612701416016
+          }
+        },
+        {
+          "feature_date": "2025-05",
+          "target_date": "2025-08",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인하",
+          "xgb_pred": "인하",
+          "rf_probabilities": {
+            "인하": 0.7691287798315662,
+            "동결": 0.18343655869700762,
+            "인상": 0.04743466147142618
+          },
+          "xgb_probabilities": {
+            "인하": 0.7865925431251526,
+            "동결": 0.09722907841205597,
+            "인상": 0.11617844551801682
+          }
+        },
+        {
+          "feature_date": "2025-06",
+          "target_date": "2025-09",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인하",
+          "xgb_pred": "인하",
+          "rf_probabilities": {
+            "인하": 0.6589685756566563,
+            "동결": 0.2811072670735983,
+            "인상": 0.0599241572697455
+          },
+          "xgb_probabilities": {
+            "인하": 0.7729883790016174,
+            "동결": 0.09974034875631332,
+            "인상": 0.12727126479148865
+          }
+        },
+        {
+          "feature_date": "2025-07",
+          "target_date": "2025-10",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인하",
+          "xgb_pred": "인하",
+          "rf_probabilities": {
+            "인하": 0.6469334659148901,
+            "동결": 0.28802935938617047,
+            "인상": 0.0650371746989394
+          },
+          "xgb_probabilities": {
+            "인하": 0.7603922486305237,
+            "동결": 0.11192695796489716,
+            "인상": 0.12768080830574036
+          }
+        },
+        {
+          "feature_date": "2025-08",
+          "target_date": "2025-11",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인하",
+          "xgb_pred": "인하",
+          "rf_probabilities": {
+            "인하": 0.6284796815671431,
+            "동결": 0.3075781729736838,
+            "인상": 0.06394214545917333
+          },
+          "xgb_probabilities": {
+            "인하": 0.7744075059890747,
+            "동결": 0.10577122122049332,
+            "인상": 0.11982128024101257
+          }
+        },
+        {
+          "feature_date": "2025-09",
+          "target_date": "2025-12",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인하",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.5609112473353961,
+            "동결": 0.3151466072054307,
+            "인상": 0.12394214545917331
+          },
+          "xgb_probabilities": {
+            "인하": 0.37815946340560913,
+            "동결": 0.04626547545194626,
+            "인상": 0.5755751132965088
+          }
+        }
+      ]
+    },
+    {
+      "fold": 4,
+      "train_period": [
+        "2022-01",
+        "2025-06"
+      ],
+      "gap_period": [
+        "2025-07",
+        "2025-09"
+      ],
+      "test_period": [
+        "2025-10",
+        "2026-03"
+      ],
+      "train_samples": 42,
+      "test_samples": 6,
+      "train_distribution": {
+        "인상": 12,
+        "동결": 20,
+        "인하": 10
+      },
+      "test_distribution": {
+        "동결": 6
+      },
+      "index_alignment": {
+        "x_test_indices": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50
+        ],
+        "y_test_indices": [
+          45,
+          46,
+          47,
+          48,
+          49,
+          50
+        ],
+        "dates_sorted": true
+      },
+      "models": {
+        "random_forest": {
+          "correct": 1,
+          "total": 6,
+          "accuracy": 0.16666666666666666,
+          "macro_f1": 0.09523809523809523,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              5
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 0.16666666666666666,
+            "인상": 0.0
+          },
+          "prediction_distribution": {
+            "동결": 1,
+            "인상": 5
+          },
+          "model_classes": [
+            "동결",
+            "인상",
+            "인하"
+          ],
+          "matches_displayed_metrics": true,
+          "below_baselines": [
+            "always_hold",
+            "previous_direction",
+            "train_majority"
+          ]
+        },
+        "xgboost": {
+          "correct": 0,
+          "total": 6,
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              6
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 0.0,
+            "인상": 0.0
+          },
+          "prediction_distribution": {
+            "인상": 6
+          },
+          "encoder_classes": [
+            "동결",
+            "인상",
+            "인하"
+          ],
+          "model_classes": [
+            0,
+            1,
+            2
+          ],
+          "matches_displayed_metrics": true,
+          "below_baselines": [
+            "always_hold",
+            "previous_direction",
+            "train_majority"
+          ]
+        }
+      },
+      "baselines": {
+        "always_hold": {
+          "correct": 6,
+          "total": 6,
+          "accuracy": 1.0,
+          "macro_f1": 0.3333333333333333,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          }
+        },
+        "previous_direction": {
+          "correct": 6,
+          "total": 6,
+          "accuracy": 1.0,
+          "macro_f1": 0.3333333333333333,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          }
+        },
+        "train_majority": {
+          "correct": 6,
+          "total": 6,
+          "accuracy": 1.0,
+          "macro_f1": 0.3333333333333333,
+          "confusion_matrix": [
+            [
+              0,
+              0,
+              0
+            ],
+            [
+              0,
+              6,
+              0
+            ],
+            [
+              0,
+              0,
+              0
+            ]
+          ],
+          "recall": {
+            "인하": 0.0,
+            "동결": 1.0,
+            "인상": 0.0
+          }
+        }
+      },
+      "rows": [
+        {
+          "feature_date": "2025-10",
+          "target_date": "2026-01",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "동결",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.4026215078345076,
+            "동결": 0.40687330964993956,
+            "인상": 0.19050518251555293
+          },
+          "xgb_probabilities": {
+            "인하": 0.15659721195697784,
+            "동결": 0.11443134397268295,
+            "인상": 0.7289714217185974
+          }
+        },
+        {
+          "feature_date": "2025-11",
+          "target_date": "2026-02",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인상",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.3289623573880539,
+            "동결": 0.32479977604668003,
+            "인상": 0.34623786656526595
+          },
+          "xgb_probabilities": {
+            "인하": 0.11689529567956924,
+            "동결": 0.047575559467077255,
+            "인상": 0.8355291485786438
+          }
+        },
+        {
+          "feature_date": "2025-12",
+          "target_date": "2026-03",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인상",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.3028069592080394,
+            "동결": 0.3133723651275812,
+            "인상": 0.38382067566437944
+          },
+          "xgb_probabilities": {
+            "인하": 0.13490542769432068,
+            "동결": 0.04721124842762947,
+            "인상": 0.817883312702179
+          }
+        },
+        {
+          "feature_date": "2026-01",
+          "target_date": "2026-04",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인상",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.36655724218436236,
+            "동결": 0.2557802556725136,
+            "인상": 0.37766250214312425
+          },
+          "xgb_probabilities": {
+            "인하": 0.22241345047950745,
+            "동결": 0.04997082054615021,
+            "인상": 0.7276157140731812
+          }
+        },
+        {
+          "feature_date": "2026-02",
+          "target_date": "2026-05",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인상",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.29119460049181406,
+            "동결": 0.27572838735816046,
+            "인상": 0.4330770121500256
+          },
+          "xgb_probabilities": {
+            "인하": 0.2177964448928833,
+            "동결": 0.04719216749072075,
+            "인상": 0.7350113391876221
+          }
+        },
+        {
+          "feature_date": "2026-03",
+          "target_date": "2026-06",
+          "current_rate": 2.5,
+          "future_rate": 2.5,
+          "y_true": "동결",
+          "rf_pred": "인상",
+          "xgb_pred": "인상",
+          "rf_probabilities": {
+            "인하": 0.20977156207225867,
+            "동결": 0.3057171274144958,
+            "인상": 0.48451131051324564
+          },
+          "xgb_probabilities": {
+            "인하": 0.17224183678627014,
+            "동결": 0.09983956068754196,
+            "인상": 0.7279185652732849
+          }
+        }
+      ]
+    }
+  ],
+  "overall": {
+    "random_forest": {
+      "correct": 5,
+      "total": 24,
+      "accuracy": 0.20833333333333334,
+      "macro_f1": 0.14043209876543208,
+      "confusion_matrix": [
+        [
+          1,
+          9,
+          0
+        ],
+        [
+          5,
+          4,
+          5
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "recall": {
+        "인하": 0.1,
+        "동결": 0.2857142857142857,
+        "인상": 0.0
+      },
+      "mean_fold_accuracy": 0.20833333333333331,
+      "mean_fold_macro_f1": 0.10317460317460317
+    },
+    "xgboost": {
+      "correct": 4,
+      "total": 24,
+      "accuracy": 0.16666666666666666,
+      "macro_f1": 0.14444444444444446,
+      "confusion_matrix": [
+        [
+          1,
+          3,
+          6
+        ],
+        [
+          4,
+          3,
+          7
+        ],
+        [
+          0,
+          0,
+          0
+        ]
+      ],
+      "recall": {
+        "인하": 0.1,
+        "동결": 0.21428571428571427,
+        "인상": 0.0
+      },
+      "mean_fold_accuracy": 0.16666666666666666,
+      "mean_fold_macro_f1": 0.08333333333333333
+    }
+  }
+}
