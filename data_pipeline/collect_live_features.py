@@ -5,7 +5,7 @@
 """
 
 import json
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from statistics import fmean
 from typing import Any
@@ -141,7 +141,9 @@ def main() -> None:
 
     fred_rows = fred.get_observations(
         series_id="DFF",
-        observation_start=f"{today.year:04d}-{today.month:02d}-01",
+        # 월초나 휴일에는 이번 달 DFF가 아직 게시되지 않을 수 있다.
+        # 직전 공개 영업일을 포함하도록 최근 14일을 조회한다.
+        observation_start=(today - timedelta(days=14)).isoformat(),
         observation_end=today.isoformat(),
         frequency="d",
     )
