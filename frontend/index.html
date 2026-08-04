@@ -8,7 +8,7 @@
       content="경제지표와 머신러닝을 활용한 한국 기준금리 예측 대시보드"
     />
     <title>RateScope — 한국 기준금리 전망</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260804-6" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260804-7" />
   </head>
   <body>
     <header class="topbar">
@@ -21,6 +21,7 @@
         <a href="#drivers">예측 근거</a>
         <a href="#models">모델 검증</a>
         <a href="#features">주요 변수</a>
+        <a class="nav-insight" href="#insight">Insight</a>
         <a href="/docs" target="_blank" rel="noreferrer">API 문서 ↗</a>
         <button id="theme-toggle" class="theme-toggle" type="button" aria-label="화면 테마 변경">☼</button>
       </nav>
@@ -497,6 +498,71 @@
           Brier Score는 확률 예측 오차로 낮을수록 좋습니다. 한 지표만
           개선됐다고 신뢰도가 충분하다고 판단하지 않습니다.
         </p>
+      </section>
+
+      <section class="panel my-insight" id="insight">
+        <header class="insight-hero">
+          <p class="eyebrow">MY INSIGHT</p>
+          <h2>AI는 경제를 예측하지만,<br />중앙은행은 정책을 결정합니다</h2>
+          <p class="insight-lead">AI는 과거 데이터를 기반으로 미래를 예측하지만, 중앙은행은 미래의 위험까지 고려하여 정책을 결정합니다.</p>
+        </header>
+
+        <article class="insight-narrative">
+          <span class="insight-number">01</span>
+          <div>
+            <p class="eyebrow">CORE INSIGHT</p>
+            <h3>프로젝트를 통해 얻은 핵심 인사이트</h3>
+            <div class="insight-copy">
+              <p>처음에는 기준금리 역시 경제지표를 충분히 학습하면 높은 정확도로 예측할 수 있을 것이라고 생각했습니다. 그러나 모델의 예측 결과와 실제 한국은행의 기준금리 결정을 비교하면서, 경제지표만으로는 정책 결정을 완전히 설명하기 어렵다는 점을 확인했습니다.</p>
+              <p>물가, 성장률, 실업률과 같은 정량적 지표는 기준금리 결정의 중요한 근거입니다. 하지만 실제 정책에는 환율, 가계부채, 부동산시장, 금융시장 안정, 글로벌 경제 환경, 금융통화위원회의 판단과 같은 요소도 함께 반영됩니다.</p>
+              <p>AI는 과거에 관측된 데이터와 패턴을 기반으로 가장 가능성이 높은 결과를 예측합니다. 반면 중앙은행은 현재의 경제 상황뿐 아니라 앞으로 발생할 수 있는 위험과 정책의 파급효과까지 고려하여 결정을 내립니다.</p>
+            </div>
+          </div>
+        </article>
+
+        <div class="insight-block">
+          <div class="insight-section-heading"><span class="insight-number">02</span><div><p class="eyebrow">TWO PERSPECTIVES</p><h3>AI 판단과 중앙은행 판단 비교</h3></div></div>
+          <div class="judgment-comparison">
+            <article class="insight-card ai-card">
+              <span class="card-label">DATA-DRIVEN FORECAST</span><h4>AI의 판단</h4>
+              <ul><li>과거 경제지표의 패턴 학습</li><li>경기 둔화 시 금리 인하 가능성 증가</li><li>물가, 성장률, 실업률 등 정량 데이터 중심</li><li>데이터에 포함된 관계를 기반으로 확률 계산</li></ul>
+              <blockquote>과거에는 이러한 경제 상황에서 금리 인하가 자주 나타났습니다.</blockquote>
+            </article>
+            <div class="versus" aria-hidden="true"><span>VS</span><i></i></div>
+            <article class="insight-card bank-card">
+              <span class="card-label">POLICY DECISION</span><h4>중앙은행의 판단</h4>
+              <ul><li>물가와 경기 상황을 종합적으로 평가</li><li>환율과 가계부채 등 금융안정 위험 고려</li><li>글로벌 경제와 시장 반응 반영</li><li>정책위원의 판단과 미래 위험까지 고려</li></ul>
+              <blockquote>정책 결정은 단순한 예측이 아니라 여러 위험 사이의 선택입니다.</blockquote>
+            </article>
+          </div>
+        </div>
+
+        <article class="explainability-callout">
+          <span class="insight-number">03</span>
+          <div><p class="eyebrow">BEYOND ACCURACY</p><h3>예측을 맞히는 것보다, 왜 그렇게 예측했는지를 설명하는 것이 중요합니다</h3>
+            <p>이 프로젝트를 진행하며 모델의 정확도만큼 중요한 것은 예측의 근거와 실패 원인을 설명하는 능력이라는 점을 배웠습니다. 금융기관에서는 단순히 상승, 동결, 인하 결과만 확인하는 것이 아니라 어떤 경제지표가 판단에 영향을 주었는지, 실제 결과와 차이가 발생한 이유는 무엇인지 함께 분석해야 합니다.</p>
+            <p>따라서 본 프로젝트는 예측 결과뿐 아니라 변수 중요도, 모델 신뢰도, 실제 정책 결정과의 차이를 함께 제공하는 의사결정 지원 시스템을 지향합니다.</p>
+          </div>
+        </article>
+
+        <div class="insight-block">
+          <div class="insight-section-heading"><span class="insight-number">04</span><div><p class="eyebrow">ERROR ANALYSIS</p><h3>모델이 틀릴 수 있는 이유</h3></div></div>
+          <div class="error-reason-grid">
+            <article class="insight-card"><span>01</span><h4>정책 판단</h4><p>중앙은행은 데이터만으로 표현하기 어려운 정책적 우선순위를 고려합니다.</p></article>
+            <article class="insight-card"><span>02</span><h4>예외적 충격</h4><p>팬데믹, 전쟁, 금융위기와 같은 사건은 과거의 일반적인 패턴을 무너뜨릴 수 있습니다.</p></article>
+            <article class="insight-card"><span>03</span><h4>누락된 정보</h4><p>중앙은행 발언, 금융통화위원회 의사록, 시장 기대와 같은 비정형 정보가 모델에 포함되지 않았을 수 있습니다.</p></article>
+          </div>
+        </div>
+
+        <div class="insight-block future-direction">
+          <div class="insight-section-heading"><span class="insight-number">05</span><div><p class="eyebrow">NEXT EVOLUTION</p><h3>앞으로의 발전 방향</h3></div></div>
+          <ol class="insight-roadmap">
+            <li><span>01</span><div><strong>정형 경제지표 기반 예측</strong><p>물가, 성장률, 실업률, 환율 등 경제지표를 활용해 기준금리 방향을 예측합니다.</p></div></li>
+            <li><span>02</span><div><strong>예측 근거 설명</strong><p>Feature Importance 또는 SHAP 등을 활용해 어떤 변수가 예측에 영향을 주었는지 설명합니다.</p></div></li>
+            <li><span>03</span><div><strong>비정형 데이터 결합</strong><p>한국은행 총재 발언, 금융통화위원회 의사록, 경제 뉴스와 시장 심리를 분석에 추가합니다.</p></div></li>
+            <li><span>04</span><div><strong>금융 의사결정 지원 시스템</strong><p>예측값만 제공하는 것이 아니라 예측 근거, 불확실성, 위험요인을 함께 제시하는 시스템으로 발전시킵니다.</p></div></li>
+          </ol>
+        </div>
       </section>
 
       <section class="notice">
