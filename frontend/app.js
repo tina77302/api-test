@@ -283,6 +283,116 @@ function initializeRateExplorer(rows) {
   update();
 }
 
+function topDirection(probabilities) {
+  return Object.entries(probabilities).sort((a, b) => b[1] - a[1])[0];
+}
+
+function renderModelClassroom(forecast, reliability) {
+  const forest = forecast.models.random_forest;
+  const boost = forecast.models.xgboost;
+  const hierarchy = reliability.latest_prediction;
+  const ensemble = forecast.latest_ensemble;
+  const featureList = (model) => model.top_features.slice(0, 3)
+    .map((item) => featureNameMap[item.feature] ?? item.feature).join(" · ");
+  const params = (items) => Object.entries(items).map(([key, value]) => `<span><b>${key}</b>${value}</span>`).join("");
+  const probabilitySummary = (probabilities) => ["인하", "동결", "인상"]
+    .map((label) => `<div class="lesson-probability ${label}"><span>${label}</span><i><b style="width:${Number(probabilities[label]) * 100}%"></b></i><strong>${percent(probabilities[label])}</strong></div>`).join("");
+  const [forestDirection] = topDirection(forest.latest_probabilities);
+  const [boostDirection] = topDirection(boost.latest_probabilities);
+  const lessons = {
+    random_forest: {
+      kicker: "여러 의사결정나무의 다수결",
+      title: "Random Forest",
+      flow: ["월별 경제지표 19개", "서로 다른 표본·변수로 여러 나무 학습", "각 나무가 인하·동결·인상에 투표", "나무별 확률을 평균"],
+      formula: "P(방향) = 모든 의사결정나무가 낸 방향별 확률의 평균",
+      params: forest.best_params,
+      probabilities: forest.latest_probabilities,
+      interpretation: `현재 가장 높은 선택은 ${forestDirection}입니다. 모델이 크게 참고한 변수는 ${featureList(forest)}입니다. 비선형 관계와 변수 간 조합을 포착하는 데 유리합니다.`,
+      conclusion: `시간순 검증 정확도는 ${percent(forest.cv_metrics.accuracy)}, Macro F1은 ${Number(forest.cv_metrics.macro_f1).toFixed(3)}입니다. 단순 동결 기준보다 나은지 반드시 함께 비교해야 합니다.`,
+      limitation: "변수 중요도는 인과관계가 아닙니다. 표본이 작으면 나무 구성이 바뀔 때 확률과 순위도 크게 달라질 수 있습니다.",
+    },
+    xgboost: {
+      kicker: "이전 나무의 오류를 순차 보정",
+      title: "XGBoost",
+      flow: ["월별 경제지표 19개", "첫 번째 작은 나무가 초기 분류", "틀린 사례에 다음 나무가 집중", "보정값을 누적해 방향 확률 계산"],
+      formula: "최종 점수 = 첫 예측 + 학습률 × 각 보정 나무의 점수",
+      params: boost.best_params,
+      probabilities: boost.latest_probabilities,
+      interpretation: `현재 가장 높은 선택은 ${boostDirection}입니다. 주요 신호는 ${featureList(boost)}입니다. 작은 변화가 연속적으로 누적되는 패턴을 학습하는 데 강점이 있습니다.`,
+      conclusion: `시간순 검증 정확도는 ${percent(boost.cv_metrics.accuracy)}, Macro F1은 ${Number(boost.cv_metrics.macro_f1).toFixed(3)}입니다. 현재 데이터에서는 인상 사례 탐지 성능을 충분히 검증하지 못했습니다.`,
+      limitation: "적은 표본에서 반복 보정하면 과거 잡음까지 학습할 수 있습니다. 학습률과 나무 깊이에 따라 결과가 민감하게 바뀝니다.",
+    },
+    hierarchical: {
+      kicker: "변경 여부와 방향을 나눠 계산",
+      title: "계층형 Logistic",
+      flow: ["2008년 이후 자료에 최근 가중치 적용", "1단계: 변경 또는 동결 확률", "2단계: 변경 조건에서 인하 또는 인상", "두 단계 확률을 곱해 최종 3방향 확률"],
+      formula: "P(인하) = P(변경) × P(인하 | 변경)",
+      params: {"1단계 C": reliability.selected_params.change_vs_hold.C, "2단계 C": reliability.selected_params.cut_vs_hike.C, "최근 가중 반감기": "60개월"},
+      probabilities: hierarchy.probabilities,
+      interpretation: `동결이 많은 금리 데이터의 특성을 반영해 먼저 변경 여부를 묻습니다. 현재 결과는 ${hierarchy.direction}이며, 각 단계의 계수 방향을 통해 신호를 비교적 쉽게 설명할 수 있습니다.`,
+      conclusion: `검증 정확도 ${percent(reliability.validation.model_metrics.accuracy)}, Macro F1 ${Number(reliability.validation.model_metrics.macro_f1).toFixed(3)}, Brier Score ${Number(reliability.validation.model_metrics.brier_score).toFixed(3)}입니다.`,
+      limitation: "변수와 결과 사이가 직선적인 로그오즈 관계라고 가정합니다. 복잡한 임계점과 변수 조합을 충분히 표현하지 못할 수 있습니다.",
+    },
+    ensemble: {
+      kicker: "서로 다른 모델의 확률을 동일 비중 결합",
+      title: "Random Forest + XGBoost 평균",
+      flow: ["Random Forest 방향 확률", "XGBoost 방향 확률", "방향별 확률을 50:50 평균", "가장 높은 평균 확률을 기본 시나리오로 선택"],
+      formula: "P앙상블(방향) = [PRF(방향) + PXGB(방향)] ÷ 2",
+      params: {"Random Forest": "50%", "XGBoost": "50%", "확률 보정": "미적용"},
+      probabilities: ensemble.probabilities,
+      interpretation: `두 모델의 서로 다른 오류를 완화하려는 방식입니다. 현재 기본 시나리오는 ${ensemble.direction}이지만, 모델 간 의견이 다르면 평균값만 보고 강한 합의로 해석하면 안 됩니다.`,
+      conclusion: `Random Forest는 ${forestDirection}, XGBoost는 ${boostDirection}을 가장 높게 봅니다. ${forestDirection === boostDirection ? "두 모델의 1순위 방향이 일치합니다." : "두 모델의 1순위 방향이 달라 불확실성이 큽니다."}`,
+      limitation: "두 모델이 같은 데이터와 유사한 변수로 학습하므로 완전히 독립적이지 않습니다. 평균 확률은 실제 발생 확률로 보정된 값이 아닙니다.",
+    },
+  };
+  function selectLesson(key) {
+    const lesson = lessons[key];
+    document.querySelectorAll("[data-model-lesson]").forEach((button) => button.classList.toggle("active", button.dataset.modelLesson === key));
+    document.querySelector("#model-lesson").innerHTML = `<div class="lesson-header"><span>${lesson.kicker}</span><h3>${lesson.title}</h3></div>
+      <div class="calculation-flow">${lesson.flow.map((step, index) => `<div><span>0${index + 1}</span><strong>${step}</strong></div>${index < lesson.flow.length - 1 ? "<i>→</i>" : ""}`).join("")}</div>
+      <code class="model-formula">${lesson.formula}</code>
+      <div class="lesson-layout"><div><h4>현재 방향 확률</h4>${probabilitySummary(lesson.probabilities)}</div><div><h4>실제 적용 설정</h4><div class="parameter-chips">${params(lesson.params)}</div></div></div>
+      <div class="lesson-conclusions"><article><span>해석</span><p>${lesson.interpretation}</p></article><article><span>검증과 결론</span><p>${lesson.conclusion}</p></article><article class="warning"><span>한계</span><p>${lesson.limitation}</p></article></div>`;
+  }
+  document.querySelector(".model-tabs").addEventListener("click", (event) => {
+    const button = event.target.closest("[data-model-lesson]");
+    if (button) selectLesson(button.dataset.modelLesson);
+  });
+  selectLesson("random_forest");
+}
+
+function renderUncertaintyAnalysis(forecast, reliability, rows) {
+  const modelDirections = Object.values(forecast.models).map((model) => topDirection(model.latest_probabilities)[0]);
+  modelDirections.push(reliability.latest_prediction.direction);
+  const agreementCount = Math.max(...["인하", "동결", "인상"].map((label) => modelDirections.filter((item) => item === label).length));
+  const ranking = Object.values(forecast.latest_ensemble.probabilities).sort((a, b) => b - a);
+  const margin = ranking[0] - ranking[1];
+  const latest = rows.at(-1);
+  const fields = ["inflation", "exchange_rate", "bond_3y", "us_policy_rate"];
+  const extremeFields = fields.filter((field) => {
+    const values = rows.map((row) => Number(row[field]));
+    const mean = values.reduce((sum, value) => sum + value, 0) / values.length;
+    const deviation = Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length) || 1;
+    return Math.abs((Number(latest[field]) - mean) / deviation) > 2;
+  });
+  const baseline = forecast.validation.hold_baseline_metrics.accuracy;
+  const modelsBelowBaseline = Object.values(forecast.models).every((model) => model.cv_metrics.accuracy < baseline);
+  const score = Number(agreementCount < 3) + Number(margin < .15) + Number(extremeFields.length > 0) + Number(modelsBelowBaseline);
+  const levels = ["낮음", "보통", "높음", "매우 높음"];
+  const level = levels[Math.min(score, 3)];
+  const levelElement = document.querySelector("#uncertainty-level");
+  levelElement.textContent = `${level} 불확실성`;
+  levelElement.dataset.level = level;
+  const checks = [
+    ["모델 합의", `${agreementCount}/3개 모델이 같은 방향`, agreementCount === 3 ? "good" : "warn"],
+    ["시나리오 간격", `1·2순위 차이 ${percent(margin)}`, margin >= .15 ? "good" : "warn"],
+    ["과거 범위 비교", extremeFields.length ? `${extremeFields.map((field) => featureNameMap[field]).join("·")} 이례적` : "주요 지표가 과거 범위 안", extremeFields.length ? "warn" : "good"],
+    ["Baseline 비교", modelsBelowBaseline ? "두 모델 모두 단순 기준 미달" : "일부 모델이 단순 기준 상회", modelsBelowBaseline ? "danger" : "good"],
+  ];
+  document.querySelector("#uncertainty-analysis").innerHTML = `<div class="uncertainty-checks">${checks.map(([name, value, tone]) => `<div class="${tone}"><span>${name}</span><strong>${value}</strong></div>`).join("")}</div>
+    <p><b>종합 해석</b> 현재 불확실성은 <strong>${level}</strong> 수준으로 평가됩니다. 이 평가는 모델의 의견 차이와 과거 검증 상태를 설명하는 지표이며, 블랙스완의 발생 확률을 계산한 값은 아닙니다.</p>`;
+}
+
 function lineChart(rows, field, unit, color) {
   const values = rows.map((row) => Number(row[field])).filter(Number.isFinite);
   if (!values.length) return "";
@@ -751,6 +861,8 @@ async function loadDashboard() {
     renderAnalysisExplanation(forecast);
     renderReliability(reliability);
     renderReliabilityDiagram();
+    renderModelClassroom(forecast, reliability);
+    renderUncertaintyAnalysis(forecast, reliability, history.rows);
     document.querySelector("#model-cards").innerHTML = Object.entries(
       forecast.models,
     )

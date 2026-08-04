@@ -8,7 +8,7 @@
       content="경제지표와 머신러닝을 활용한 한국 기준금리 예측 대시보드"
     />
     <title>RateScope — 한국 기준금리 전망</title>
-    <link rel="stylesheet" href="/static/styles.css?v=20260804-5" />
+    <link rel="stylesheet" href="/static/styles.css?v=20260804-6" />
   </head>
   <body>
     <header class="topbar">
@@ -266,6 +266,33 @@
         <div id="feature-columns" class="feature-columns"></div>
       </section>
 
+      <section class="panel model-classroom" id="model-classroom">
+        <div class="panel-heading">
+          <div><p class="eyebrow">MODEL CLASSROOM</p><h2>모델은 어떻게 계산하고 결론을 내리나요?</h2></div>
+          <span class="method-badge">계산 → 해석 → 한계</span>
+        </div>
+        <div class="model-tabs" role="tablist" aria-label="모델 설명 선택">
+          <button type="button" class="active" data-model-lesson="random_forest">Random Forest</button>
+          <button type="button" data-model-lesson="xgboost">XGBoost</button>
+          <button type="button" data-model-lesson="hierarchical">계층형 Logistic</button>
+          <button type="button" data-model-lesson="ensemble">모델 평균</button>
+        </div>
+        <div id="model-lesson" class="model-lesson" aria-live="polite"></div>
+      </section>
+
+      <section class="uncertainty-grid" id="uncertainty">
+        <article class="panel uncertainty-summary">
+          <div class="panel-heading"><div><p class="eyebrow">UNCERTAINTY LENS</p><h2>예측 가능성 점검</h2></div><strong id="uncertainty-level">분석 중</strong></div>
+          <div id="uncertainty-analysis" class="uncertainty-analysis"></div>
+        </article>
+        <article class="panel risk-dictionary">
+          <div class="panel-heading"><div><p class="eyebrow">RISK DICTIONARY</p><h2>모델 밖의 위험</h2></div></div>
+          <details open><summary>블랙스완 <span>예측하기 어려운 충격</span></summary><p>팬데믹이나 갑작스러운 금융 붕괴처럼 과거 자료에 유사 사례가 거의 없는 사건입니다. 모델이 발생 자체를 예측한다고 볼 수 없습니다.</p></details>
+          <details><summary>그레이 라이노 <span>알려졌지만 방치되는 위험</span></summary><p>가계부채, 부동산 부실, 장기 고금리처럼 위험은 보이지만 발생 시점과 충격 크기가 불확실한 문제입니다.</p></details>
+          <details><summary>구조 변화 <span>과거 관계의 변화</span></summary><p>팬데믹 전후처럼 물가·환율·금리의 관계가 달라지면 과거 패턴에 의존한 모델의 정확도가 낮아질 수 있습니다.</p></details>
+        </article>
+      </section>
+
       <section class="explanation-grid" id="methodology">
         <article class="panel methodology-panel">
           <div class="panel-heading">
@@ -499,6 +526,6 @@
       <span>RateScope · FastAPI + ECOS + FRED</span>
       <span id="footer-period"></span>
     </footer>
-    <script src="/static/app.js?v=20260804-5" defer></script>
+    <script src="/static/app.js?v=20260804-6" defer></script>
   </body>
 </html>

@@ -264,6 +264,28 @@ thead { color: var(--muted); }
   display: block; height: 3px; margin-top: .4rem;
   border-radius: 4px; background: var(--lime);
 }
+.model-tabs { display: flex; overflow-x: auto; gap: .45rem; margin-bottom: 1rem; padding-bottom: .2rem; }
+.model-tabs button { white-space: nowrap; border: 1px solid var(--line); border-radius: 999px; padding: .5rem .85rem; color: var(--muted); background: var(--panel-2); cursor: pointer; font: inherit; font-size: .72rem; }
+.model-tabs button.active { color: #0a0c0b; border-color: var(--lime); background: var(--lime); }
+.model-lesson { border: 1px solid var(--line); border-radius: 1rem; padding: 1.2rem; background: var(--panel-2); }
+.lesson-header span { color: var(--muted); font-size: .68rem; }.lesson-header h3 { margin: .25rem 0 1rem; font-size: 1.4rem; }
+.calculation-flow { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr; gap: .55rem; align-items: center; }
+.calculation-flow > div { min-height: 5.2rem; border: 1px solid var(--line); border-radius: .7rem; padding: .75rem; background: var(--panel); }
+.calculation-flow > div span { display: block; color: var(--lime); font: italic .8rem Georgia, serif; }.calculation-flow > div strong { display: block; margin-top: .5rem; font-size: .7rem; line-height: 1.45; }
+.calculation-flow > i { color: var(--lime); font-style: normal; }
+.model-formula { display: block; margin: .8rem 0; border-left: 2px solid var(--lime); padding: .75rem 1rem; color: var(--lime); background: var(--panel); white-space: normal; font-size: .76rem; }
+.lesson-layout { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+.lesson-layout > div { border: 1px solid var(--line); border-radius: .7rem; padding: .9rem; background: var(--panel); }
+.lesson-layout h4 { margin: 0 0 .8rem; font-size: .74rem; }
+.lesson-probability { display: grid; grid-template-columns: 2.5rem 1fr auto; gap: .55rem; align-items: center; margin: .55rem 0; font-size: .67rem; }
+.lesson-probability > i { overflow: hidden; height: .38rem; border-radius: 99px; background: var(--line); }.lesson-probability > i b { display: block; height: 100%; background: var(--muted); }.lesson-probability.인하 > i b { background: var(--blue); }.lesson-probability.인상 > i b { background: var(--red); }
+.parameter-chips { display: flex; flex-wrap: wrap; gap: .5rem; }.parameter-chips span { border: 1px solid var(--line); border-radius: .5rem; padding: .5rem .65rem; color: var(--muted); font-size: .65rem; }.parameter-chips b { display: block; margin-bottom: .2rem; color: var(--ink); font-weight: 600; }
+.lesson-conclusions { display: grid; grid-template-columns: repeat(3, 1fr); gap: .7rem; margin-top: .8rem; }.lesson-conclusions article { border-top: 2px solid var(--blue); border-radius: .65rem; padding: .8rem; background: var(--panel); }.lesson-conclusions article:nth-child(2) { border-color: var(--lime); }.lesson-conclusions article.warning { border-color: var(--orange); }.lesson-conclusions span { color: var(--muted); font-size: .62rem; }.lesson-conclusions p { margin: .4rem 0 0; font-size: .7rem; line-height: 1.6; }
+.uncertainty-grid { display: grid; grid-template-columns: 1.15fr .85fr; gap: 1rem; }.uncertainty-grid .panel { min-width: 0; }
+.uncertainty-summary .panel-heading > strong { border-radius: 999px; padding: .4rem .7rem; color: var(--lime); background: rgb(207 255 90 / 10%); font-size: .72rem; }.uncertainty-summary .panel-heading > strong[data-level="높음"], .uncertainty-summary .panel-heading > strong[data-level="매우 높음"] { color: var(--orange); background: rgb(255 196 93 / 10%); }
+.uncertainty-checks { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }.uncertainty-checks > div { border: 1px solid var(--line); border-radius: .7rem; padding: .8rem; background: var(--panel-2); }.uncertainty-checks span, .uncertainty-checks strong { display: block; }.uncertainty-checks span { color: var(--muted); font-size: .62rem; }.uncertainty-checks strong { margin-top: .35rem; font-size: .72rem; }.uncertainty-checks .good { border-left: 2px solid var(--lime); }.uncertainty-checks .warn { border-left: 2px solid var(--orange); }.uncertainty-checks .danger { border-left: 2px solid var(--red); }
+.uncertainty-analysis > p { margin: .8rem 0 0; border-radius: .7rem; padding: .9rem; color: var(--muted); background: var(--panel-2); font-size: .72rem; line-height: 1.6; }.uncertainty-analysis > p b { display: block; margin-bottom: .25rem; color: var(--ink); }.uncertainty-analysis > p strong { color: var(--orange); }
+.risk-dictionary details { border-bottom: 1px solid var(--line); }.risk-dictionary details:last-child { border-bottom: 0; }.risk-dictionary summary { display: flex; justify-content: space-between; gap: 1rem; padding: .8rem 0; cursor: pointer; font-size: .78rem; font-weight: 700; }.risk-dictionary summary span { color: var(--muted); font-size: .62rem; font-weight: 400; }.risk-dictionary details p { margin: 0 0 .9rem; color: var(--muted); font-size: .7rem; line-height: 1.6; }
 .explanation-grid {
   display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(340px, .85fr);
   gap: 1rem;
@@ -549,6 +571,9 @@ body::before {
   .freshness-bar p { grid-column: 1 / -1; text-align: left; }
   .insight-grid, .market-grid { grid-template-columns: 1fr; }
   .timeline-detail { grid-template-columns: 1fr; }
+  .uncertainty-grid { grid-template-columns: 1fr; }
+  .calculation-flow { grid-template-columns: repeat(4, 1fr); }.calculation-flow > i { display: none; }
+  .lesson-conclusions { grid-template-columns: 1fr; }
   .history-expansion, .nested-diagram { grid-template-columns: 1fr; }
   .history-expansion > p, .nested-diagram > p, .time-arrow { grid-column: 1; }
 }
@@ -571,6 +596,8 @@ body::before {
   .official-feed > a { grid-template-columns: 1fr auto; }
   .official-feed > a span { grid-column: 1 / -1; }
   .glossary-fab { right: .8rem; bottom: .8rem; }
+  .lesson-layout, .uncertainty-checks { grid-template-columns: 1fr; }
+  .calculation-flow { grid-template-columns: 1fr 1fr; }
   .panel-heading .rate-legend { display: none; }
   .indicator-tabs > span { width: 100%; }
   .explorer-controls { align-items: flex-start; flex-direction: column; }
