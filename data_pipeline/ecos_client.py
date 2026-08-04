@@ -1,6 +1,7 @@
 """한국은행 ECOS Open API의 최소 Python 클라이언트."""
 
 import os
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -51,22 +52,31 @@ class EcosClient:
         if encoded_parts:
             url = f"{url}/{encoded_parts}"
 
-        try:
-            response = httpx.get(url, timeout=30.0)
-            response.raise_for_status()
-            payload = response.json()
-        except httpx.HTTPStatusError as exc:
-            raise EcosError(
-                f"ECOS HTTP 요청에 실패했습니다 "
-                f"(상태 코드: {exc.response.status_code})."
-            ) from exc
-        except httpx.HTTPError as exc:
-            # 요청 URL에는 인증키가 포함되므로 원본 예외 문자열을 노출하지 않는다.
-            raise EcosError(
-                "ECOS 서버에 연결하지 못했습니다. 네트워크 상태를 확인해주세요."
-            ) from exc
-        except ValueError as exc:
-            raise EcosError("ECOS 응답이 올바른 JSON이 아닙니다.") from exc
+        for attempt in range(3):
+            try:
+                response = httpx.get(url, timeout=30.0)
+                response.raise_for_status()
+                payload = response.json()
+                break
+            except httpx.HTTPStatusError as exc:
+                retryable = exc.response.status_code >= 500
+                if retryable and attempt < 2:
+                    time.sleep(2 ** attempt)
+                    continue
+                raise EcosError(
+                    f"ECOS HTTP 요청에 실패했습니다 "
+                    f"(상태 코드: {exc.response.status_code})."
+                ) from exc
+            except httpx.HTTPError as exc:
+                if attempt < 2:
+                    time.sleep(2 ** attempt)
+                    continue
+                # 요청 URL에는 인증키가 포함되므로 원본 예외 문자열을 노출하지 않는다.
+                raise EcosError(
+                    "ECOS 서버에 연결하지 못했습니다. 네트워크 상태를 확인해주세요."
+                ) from exc
+            except ValueError as exc:
+                raise EcosError("ECOS 응답이 올바른 JSON이 아닙니다.") from exc
 
         if "RESULT" in payload:
             result = payload["RESULT"]
