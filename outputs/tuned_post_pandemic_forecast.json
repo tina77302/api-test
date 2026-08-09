@@ -2,7 +2,7 @@
   "analysis_period": {
     "start": "2022-01",
     "training_end": "2026-03",
-    "latest_input": "2026-08-08",
+    "latest_input": "2026-08-09",
     "training_samples": 51
   },
   "features": [
