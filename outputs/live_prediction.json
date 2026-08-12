@@ -1,5 +1,5 @@
 {
-  "as_of_date": "2026-08-11",
+  "as_of_date": "2026-08-12",
   "data_status": "partial_current_month",
   "target": "Korea policy rate three months ahead",
   "current_rate": 2.75,
@@ -9,23 +9,23 @@
       "direction": "동결"
     },
     "linear_regression": {
-      "predicted_rate": 2.8469,
+      "predicted_rate": 2.8504,
       "direction": "인상"
     },
     "direction_classifier": {
       "predicted_direction": "동결",
       "probabilities": {
-        "인하": 0.151725,
-        "동결": 0.628935,
-        "인상": 0.21934
+        "인하": 0.147456,
+        "동결": 0.628207,
+        "인상": 0.224336
       }
     },
     "random_forest": {
       "predicted_direction": "동결",
       "probabilities": {
-        "인하": 0.201643,
-        "동결": 0.427614,
-        "인상": 0.370743
+        "인하": 0.200862,
+        "동결": 0.427078,
+        "인상": 0.37206
       }
     },
     "xgboost": {
@@ -40,18 +40,18 @@
   "features": {
     "current_rate": 2.75,
     "inflation": 2.7892,
-    "exchange_rate": 1424.3857,
+    "exchange_rate": 1423.2125,
     "unemployment": 2.7,
-    "bond_3y": 3.7362,
+    "bond_3y": 3.7464,
     "us_policy_rate": 3.63
   },
   "source_periods": {
     "current_rate": "20260810",
     "inflation": "2026-07",
-    "exchange_rate": "20260803~20260811",
+    "exchange_rate": "20260803~20260812",
     "unemployment": "2026-06",
-    "bond_3y": "20260803~20260810",
-    "us_policy_rate": "2026-07-28~2026-08-07"
+    "bond_3y": "20260803~20260811",
+    "us_policy_rate": "2026-07-29~2026-08-10"
   },
   "warnings": [
     "현재 월이 끝나기 전의 잠정 입력을 사용했습니다.",
