@@ -1,8 +1,8 @@
 {
   "design": {
     "training_start": "2008-01",
-    "training_end": "2026-03",
-    "training_samples": 219,
+    "training_end": "2026-04",
+    "training_samples": 220,
     "features": [
       "current_rate",
       "inflation",
@@ -36,82 +36,81 @@
     "outer_splits": 5,
     "outer_test_months": 12,
     "test_distribution": {
-      "동결": 30,
-      "인상": 20,
+      "인상": 21,
+      "동결": 29,
       "인하": 10
     },
     "baseline_metrics": {
-      "accuracy": 0.5,
-      "macro_f1": 0.2222222222222222,
+      "accuracy": 0.48333333333333334,
+      "macro_f1": 0.21722846441947566,
       "cut_recall": 0.0,
       "hold_recall": 1.0,
       "hike_recall": 0.0,
-      "brier_score": 1.0
+      "brier_score": 1.0333333333333334
     },
     "model_metrics": {
-      "accuracy": 0.36666666666666664,
-      "macro_f1": 0.3230376344086021,
-      "cut_recall": 0.1,
-      "hold_recall": 0.4666666666666667,
-      "hike_recall": 0.35,
-      "brier_score": 0.7931984051136406
+      "accuracy": 0.31666666666666665,
+      "macro_f1": 0.2728174603174603,
+      "cut_recall": 0.0,
+      "hold_recall": 0.41379310344827586,
+      "hike_recall": 0.3333333333333333,
+      "brier_score": 0.7125076547024624
     },
     "folds": [
       {
         "fold": 1,
         "train_period": [
           "2008-01",
-          "2020-12"
+          "2021-01"
         ],
         "test_period": [
-          "2021-04",
-          "2022-03"
+          "2021-05",
+          "2022-04"
         ],
         "test_distribution": {
-          "동결": 1,
-          "인상": 11
+          "인상": 12
         },
         "metrics": {
-          "accuracy": 0.08333333333333333,
-          "macro_f1": 0.05128205128205129,
+          "accuracy": 0.0,
+          "macro_f1": 0.0,
           "cut_recall": 0.0,
-          "hold_recall": 1.0,
+          "hold_recall": 0.0,
           "hike_recall": 0.0,
-          "brier_score": 0.9937474035917052
+          "brier_score": 0.8772140958892104
         }
       },
       {
         "fold": 2,
         "train_period": [
           "2008-01",
-          "2021-12"
+          "2022-01"
         ],
         "test_period": [
-          "2022-04",
-          "2023-03"
+          "2022-05",
+          "2023-04"
         ],
         "test_distribution": {
-          "인상": 9,
-          "동결": 3
+          "인상": 8,
+          "동결": 4
         },
         "metrics": {
-          "accuracy": 0.5833333333333334,
-          "macro_f1": 0.2916666666666667,
+          "accuracy": 0.5,
+          "macro_f1": 0.2857142857142857,
           "cut_recall": 0.0,
           "hold_recall": 0.0,
-          "hike_recall": 0.7777777777777778,
-          "brier_score": 0.518127771413613
+          "hike_recall": 0.75,
+          "brier_score": 0.5847336209998335
         }
       },
       {
         "fold": 3,
         "train_period": [
           "2008-01",
-          "2022-12"
+          "2023-01"
         ],
         "test_period": [
-          "2023-04",
-          "2024-03"
+          "2023-05",
+          "2024-04"
         ],
         "test_distribution": {
           "동결": 12
@@ -122,53 +121,53 @@
           "cut_recall": 0.0,
           "hold_recall": 0.0,
           "hike_recall": 0.0,
-          "brier_score": 1.2626350146304894
+          "brier_score": 0.8062052374890679
         }
       },
       {
         "fold": 4,
         "train_period": [
           "2008-01",
-          "2023-12"
+          "2024-01"
         ],
         "test_period": [
-          "2024-04",
-          "2025-03"
+          "2024-05",
+          "2025-04"
         ],
         "test_distribution": {
-          "동결": 3,
-          "인하": 9
+          "동결": 2,
+          "인하": 10
         },
         "metrics": {
-          "accuracy": 0.25,
-          "macro_f1": 0.13333333333333333,
+          "accuracy": 0.16666666666666666,
+          "macro_f1": 0.09523809523809523,
           "cut_recall": 0.0,
           "hold_recall": 1.0,
           "hike_recall": 0.0,
-          "brier_score": 0.7706243679680015
+          "brier_score": 0.8493317960392254
         }
       },
       {
         "fold": 5,
         "train_period": [
           "2008-01",
-          "2024-12"
+          "2025-01"
         ],
         "test_period": [
-          "2025-04",
-          "2026-03"
+          "2025-05",
+          "2026-04"
         ],
         "test_distribution": {
-          "인하": 1,
-          "동결": 11
+          "동결": 11,
+          "인상": 1
         },
         "metrics": {
           "accuracy": 0.9166666666666666,
-          "macro_f1": 0.6507936507936508,
-          "cut_recall": 1.0,
+          "macro_f1": 0.5396825396825397,
+          "cut_recall": 0.0,
           "hold_recall": 0.9090909090909091,
-          "hike_recall": 0.0,
-          "brier_score": 0.420857467964395
+          "hike_recall": 1.0,
+          "brier_score": 0.44505352309497553
         }
       }
     ]
@@ -179,18 +178,18 @@
       "class_weight": "balanced"
     },
     "cut_vs_hike": {
-      "C": 1.0,
-      "class_weight": null
+      "C": 0.3,
+      "class_weight": "balanced"
     }
   },
   "latest_prediction": {
-    "as_of_date": "2026-08-15",
+    "as_of_date": "2026-08-16",
     "current_rate": 2.75,
     "direction": "동결",
     "probabilities": {
-      "인하": 0.03995916649881847,
-      "동결": 0.5428785301202033,
-      "인상": 0.4171623033809782
+      "인하": 0.04245263395816194,
+      "동결": 0.5286299996066506,
+      "인상": 0.4289173664351874
     }
   },
   "reliability_assessment": {
