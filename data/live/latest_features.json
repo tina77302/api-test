@@ -1,22 +1,22 @@
 {
-  "as_of_date": "2026-09-06",
+  "as_of_date": "2026-09-07",
   "status": "partial_current_month",
   "target": "Korea policy rate three months ahead",
   "features": {
     "current_rate": 3.0,
     "inflation": 3.0915,
-    "exchange_rate": 1368.2,
+    "exchange_rate": 1365.6,
     "unemployment": 2.8,
     "bond_3y": 3.895,
     "us_policy_rate": 3.63
   },
   "source_periods": {
-    "current_rate": "20260903",
+    "current_rate": "20260904",
     "inflation": "2026-08",
-    "exchange_rate": "20260901~20260904",
+    "exchange_rate": "20260901~20260907",
     "unemployment": "2026-07",
     "bond_3y": "20260901~20260904",
-    "us_policy_rate": "2026-08-23~2026-09-03"
+    "us_policy_rate": "2026-08-24~2026-09-03"
   },
   "notes": [
     "현재 월이 끝나기 전의 잠정 입력값입니다.",
