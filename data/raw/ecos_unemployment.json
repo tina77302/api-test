@@ -5102,5 +5102,21 @@
     "WGT": null,
     "TIME": "202607",
     "DATA_VALUE": "2.8"
+  },
+  {
+    "STAT_CODE": "902Y021",
+    "STAT_NAME": "9.1.5.2. 국제 주요국 실업률(계절변동조정)",
+    "ITEM_CODE1": "KOR",
+    "ITEM_NAME1": "한국",
+    "ITEM_CODE2": null,
+    "ITEM_NAME2": null,
+    "ITEM_CODE3": null,
+    "ITEM_NAME3": null,
+    "ITEM_CODE4": null,
+    "ITEM_NAME4": null,
+    "UNIT_NAME": "%",
+    "WGT": null,
+    "TIME": "202608",
+    "DATA_VALUE": "2.7"
   }
 ]

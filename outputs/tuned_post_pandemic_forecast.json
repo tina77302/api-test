@@ -1,9 +1,9 @@
 {
   "analysis_period": {
     "start": "2022-01",
-    "training_end": "2026-04",
-    "latest_input": "2026-09-18",
-    "training_samples": 52
+    "training_end": "2026-05",
+    "latest_input": "2026-09-19",
+    "training_samples": 53
   },
   "features": [
     "current_rate",
@@ -27,7 +27,7 @@
     "rate_direction_3m"
   ],
   "label_distribution": {
-    "인상": 13,
+    "인상": 14,
     "동결": 29,
     "인하": 10
   },
@@ -38,13 +38,13 @@
     "gap_months": 3,
     "selection_metric": "macro_f1",
     "test_label_distribution": {
-      "동결": 13,
+      "동결": 12,
       "인하": 10,
-      "인상": 1
+      "인상": 2
     },
     "hold_baseline_metrics": {
-      "accuracy": 0.5416666666666666,
-      "macro_f1": 0.23423423423423426,
+      "accuracy": 0.5,
+      "macro_f1": 0.2222222222222222,
       "cut_recall": 0.0,
       "hold_recall": 1.0,
       "hike_recall": 0.0
@@ -55,24 +55,24 @@
       "best_params": {
         "max_depth": 2,
         "min_samples_leaf": 2,
-        "max_features": 0.7,
-        "class_weight": "balanced"
+        "max_features": "sqrt",
+        "class_weight": null
       },
       "cv_metrics": {
-        "accuracy": 0.375,
-        "macro_f1": 0.3472317156527683,
-        "cut_recall": 0.6,
-        "hold_recall": 0.15384615384615385,
+        "accuracy": 0.25,
+        "macro_f1": 0.3247863247863248,
+        "cut_recall": 0.0,
+        "hold_recall": 0.3333333333333333,
         "hike_recall": 1.0
       },
       "folds": [
         {
           "fold": 1,
-          "train_samples": 25,
+          "train_samples": 26,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.3333333333333333,
-            "macro_f1": 0.16666666666666666,
+            "accuracy": 0.16666666666666666,
+            "macro_f1": 0.09523809523809523,
             "cut_recall": 0.0,
             "hold_recall": 1.0,
             "hike_recall": 0.0
@@ -80,19 +80,19 @@
         },
         {
           "fold": 2,
-          "train_samples": 31,
+          "train_samples": 32,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 1.0,
-            "macro_f1": 0.3333333333333333,
-            "cut_recall": 1.0,
-            "hold_recall": 0.0,
+            "accuracy": 0.16666666666666666,
+            "macro_f1": 0.09523809523809523,
+            "cut_recall": 0.0,
+            "hold_recall": 1.0,
             "hike_recall": 0.0
           }
         },
         {
           "fold": 3,
-          "train_samples": 37,
+          "train_samples": 38,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.0,
@@ -104,54 +104,54 @@
         },
         {
           "fold": 4,
-          "train_samples": 43,
+          "train_samples": 44,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.16666666666666666,
-            "macro_f1": 0.09523809523809523,
+            "accuracy": 0.6666666666666666,
+            "macro_f1": 0.4444444444444444,
             "cut_recall": 0.0,
-            "hold_recall": 0.0,
+            "hold_recall": 0.5,
             "hike_recall": 1.0
           }
         }
       ],
       "latest_probabilities": {
-        "인하": 0.003229438550471208,
-        "동결": 0.11051360015249242,
-        "인상": 0.8862569612970363
+        "인하": 0.04534770063836022,
+        "동결": 0.42578128413834654,
+        "인상": 0.528871015223293
       },
       "top_features": [
         {
           "feature": "bond_policy_spread",
-          "importance": 0.300823
+          "importance": 0.16277
         },
         {
           "feature": "korea_us_rate_spread",
-          "importance": 0.211087
-        },
-        {
-          "feature": "inflation",
-          "importance": 0.106537
+          "importance": 0.124268
         },
         {
           "feature": "bond_3y_change_6m",
-          "importance": 0.093313
+          "importance": 0.110664
         },
         {
-          "feature": "bond_3y",
-          "importance": 0.08608
+          "feature": "inflation",
+          "importance": 0.098022
         },
         {
           "feature": "us_policy_rate",
-          "importance": 0.056161
+          "importance": 0.094301
+        },
+        {
+          "feature": "inflation_change_6m",
+          "importance": 0.084857
         },
         {
           "feature": "rate_change_3m",
-          "importance": 0.044008
+          "importance": 0.083261
         },
         {
           "feature": "rate_direction_3m",
-          "importance": 0.032162
+          "importance": 0.061293
         }
       ]
     },
@@ -164,19 +164,19 @@
       },
       "cv_metrics": {
         "accuracy": 0.25,
-        "macro_f1": 0.24300318417965475,
+        "macro_f1": 0.24820261437908497,
         "cut_recall": 0.3,
-        "hold_recall": 0.15384615384615385,
+        "hold_recall": 0.08333333333333333,
         "hike_recall": 1.0
       },
       "folds": [
         {
           "fold": 1,
-          "train_samples": 25,
+          "train_samples": 26,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.3333333333333333,
-            "macro_f1": 0.19047619047619047,
+            "accuracy": 0.16666666666666666,
+            "macro_f1": 0.13333333333333333,
             "cut_recall": 0.0,
             "hold_recall": 1.0,
             "hike_recall": 0.0
@@ -184,19 +184,19 @@
         },
         {
           "fold": 2,
-          "train_samples": 31,
+          "train_samples": 32,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.5,
-            "macro_f1": 0.2222222222222222,
-            "cut_recall": 0.5,
+            "macro_f1": 0.25,
+            "cut_recall": 0.6,
             "hold_recall": 0.0,
             "hike_recall": 0.0
           }
         },
         {
           "fold": 3,
-          "train_samples": 37,
+          "train_samples": 38,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.0,
@@ -208,11 +208,11 @@
         },
         {
           "fold": 4,
-          "train_samples": 43,
+          "train_samples": 44,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.16666666666666666,
-            "macro_f1": 0.09523809523809523,
+            "accuracy": 0.3333333333333333,
+            "macro_f1": 0.16666666666666666,
             "cut_recall": 0.0,
             "hold_recall": 0.0,
             "hike_recall": 1.0
@@ -220,42 +220,42 @@
         }
       ],
       "latest_probabilities": {
-        "인하": 0.013000029139220715,
-        "동결": 0.1531592309474945,
-        "인상": 0.8338407278060913
+        "인하": 0.01105727069079876,
+        "동결": 0.16806825995445251,
+        "인상": 0.8208744525909424
       },
       "top_features": [
         {
-          "feature": "korea_us_rate_spread",
-          "importance": 0.108398
-        },
-        {
           "feature": "bond_policy_spread",
-          "importance": 0.103749
+          "importance": 0.109719
         },
         {
-          "feature": "us_policy_rate",
-          "importance": 0.092175
-        },
-        {
-          "feature": "inflation",
-          "importance": 0.078605
+          "feature": "korea_us_rate_spread",
+          "importance": 0.105059
         },
         {
           "feature": "inflation_change_6m",
-          "importance": 0.078252
+          "importance": 0.086987
         },
         {
-          "feature": "current_rate",
-          "importance": 0.074263
+          "feature": "inflation",
+          "importance": 0.085632
+        },
+        {
+          "feature": "us_policy_rate",
+          "importance": 0.077511
         },
         {
           "feature": "rate_direction_3m",
-          "importance": 0.072574
+          "importance": 0.074906
         },
         {
           "feature": "bond_3y_change_6m",
-          "importance": 0.067984
+          "importance": 0.073733
+        },
+        {
+          "feature": "current_rate",
+          "importance": 0.073454
         }
       ]
     }
@@ -263,9 +263,9 @@
   "latest_ensemble": {
     "direction": "인상",
     "probabilities": {
-      "인하": 0.008114733844845961,
-      "동결": 0.13183641554999348,
-      "인상": 0.8600488445515638
+      "인하": 0.028202485664579488,
+      "동결": 0.29692477204639955,
+      "인상": 0.6748727339071177
     }
   },
   "warnings": [
