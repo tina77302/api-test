@@ -99,7 +99,7 @@
           "cut_recall": 0.0,
           "hold_recall": 0.0,
           "hike_recall": 0.7142857142857143,
-          "brier_score": 0.6423911570330487
+          "brier_score": 0.6423911570330486
         }
       },
       {
@@ -144,7 +144,7 @@
           "cut_recall": 0.0,
           "hold_recall": 1.0,
           "hike_recall": 0.0,
-          "brier_score": 0.8683832162562988
+          "brier_score": 0.8683832162562987
         }
       },
       {
@@ -167,7 +167,7 @@
           "cut_recall": 0.0,
           "hold_recall": 0.9,
           "hike_recall": 1.0,
-          "brier_score": 0.44974526770455586
+          "brier_score": 0.44974526770455575
         }
       }
     ]
@@ -183,13 +183,13 @@
     }
   },
   "latest_prediction": {
-    "as_of_date": "2026-09-21",
+    "as_of_date": "2026-09-22",
     "current_rate": 3.0,
     "direction": "동결",
     "probabilities": {
-      "인하": 0.01730243244434432,
-      "동결": 0.6287027851688907,
-      "인상": 0.3539947823867651
+      "인하": 0.016989386076096496,
+      "동결": 0.6285619156902136,
+      "인상": 0.35444869823368985
     }
   },
   "reliability_assessment": {
