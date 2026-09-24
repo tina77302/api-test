@@ -1,5 +1,5 @@
 {
-  "as_of_date": "2026-09-23",
+  "as_of_date": "2026-09-24",
   "data_status": "partial_current_month",
   "target": "Korea policy rate three months ahead",
   "current_rate": 3.0,
@@ -9,15 +9,15 @@
       "direction": "동결"
     },
     "linear_regression": {
-      "predicted_rate": 3.1565,
+      "predicted_rate": 3.1583,
       "direction": "인상"
     },
     "direction_classifier": {
       "predicted_direction": "인상",
       "probabilities": {
-        "인하": 0.076112,
-        "동결": 0.422919,
-        "인상": 0.500969
+        "인하": 0.07484,
+        "동결": 0.421072,
+        "인상": 0.504088
       }
     },
     "random_forest": {
@@ -42,16 +42,16 @@
     "inflation": 3.0915,
     "exchange_rate": 1359.3824,
     "unemployment": 2.7,
-    "bond_3y": 3.9749,
-    "us_policy_rate": 3.7262
+    "bond_3y": 3.9767,
+    "us_policy_rate": 3.7454
   },
   "source_periods": {
-    "current_rate": "20260920",
+    "current_rate": "20260921",
     "inflation": "2026-08",
     "exchange_rate": "20260901~20260923",
     "unemployment": "2026-08",
-    "bond_3y": "20260901~20260922",
-    "us_policy_rate": "2026-09-09~2026-09-21"
+    "bond_3y": "20260901~20260923",
+    "us_policy_rate": "2026-09-10~2026-09-22"
   },
   "warnings": [
     "현재 월이 끝나기 전의 잠정 입력을 사용했습니다.",
