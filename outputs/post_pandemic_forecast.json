@@ -3,7 +3,7 @@
     "definition": "post-pandemic",
     "start": "2022-01",
     "training_end": "2026-05",
-    "latest_input": "2026-10-04",
+    "latest_input": "2026-10-05",
     "training_samples": 53
   },
   "target": "Korea policy-rate direction three months ahead",
