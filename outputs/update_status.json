@@ -1,7 +1,7 @@
 {
   "state": "success",
-  "started_at": "2026-10-09T06:11:14.438207+00:00",
-  "finished_at": "2026-10-09T06:12:41.569899+00:00",
+  "started_at": "2026-10-10T05:55:04.749515+00:00",
+  "finished_at": "2026-10-10T05:56:35.849680+00:00",
   "current_step": null,
   "completed_steps": [
     "data_pipeline.collect_ecos_data",

@@ -183,7 +183,7 @@
     }
   },
   "latest_prediction": {
-    "as_of_date": "2026-10-09",
+    "as_of_date": "2026-10-10",
     "current_rate": 3.0,
     "direction": "동결",
     "probabilities": {
