@@ -1,9 +1,9 @@
 {
   "analysis_period": {
     "start": "2022-01",
-    "training_end": "2026-05",
-    "latest_input": "2026-10-23",
-    "training_samples": 53
+    "training_end": "2026-06",
+    "latest_input": "2026-10-24",
+    "training_samples": 54
   },
   "features": [
     "current_rate",
@@ -27,7 +27,7 @@
     "rate_direction_3m"
   ],
   "label_distribution": {
-    "인상": 14,
+    "인상": 15,
     "동결": 29,
     "인하": 10
   },
@@ -38,13 +38,13 @@
     "gap_months": 3,
     "selection_metric": "macro_f1",
     "test_label_distribution": {
-      "동결": 12,
       "인하": 10,
-      "인상": 2
+      "동결": 11,
+      "인상": 3
     },
     "hold_baseline_metrics": {
-      "accuracy": 0.5,
-      "macro_f1": 0.2222222222222222,
+      "accuracy": 0.4583333333333333,
+      "macro_f1": 0.20952380952380953,
       "cut_recall": 0.0,
       "hold_recall": 1.0,
       "hike_recall": 0.0
@@ -53,46 +53,46 @@
   "models": {
     "random_forest": {
       "best_params": {
-        "max_depth": 2,
+        "max_depth": 4,
         "min_samples_leaf": 2,
         "max_features": "sqrt",
         "class_weight": null
       },
       "cv_metrics": {
-        "accuracy": 0.25,
-        "macro_f1": 0.3247863247863248,
-        "cut_recall": 0.0,
-        "hold_recall": 0.3333333333333333,
+        "accuracy": 0.2916666666666667,
+        "macro_f1": 0.3836675020885547,
+        "cut_recall": 0.2,
+        "hold_recall": 0.18181818181818182,
         "hike_recall": 1.0
       },
       "folds": [
         {
           "fold": 1,
-          "train_samples": 26,
+          "train_samples": 27,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.16666666666666666,
-            "macro_f1": 0.09523809523809523,
+            "accuracy": 0.0,
+            "macro_f1": 0.0,
             "cut_recall": 0.0,
-            "hold_recall": 1.0,
+            "hold_recall": 0.0,
             "hike_recall": 0.0
           }
         },
         {
           "fold": 2,
-          "train_samples": 32,
+          "train_samples": 33,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.16666666666666666,
-            "macro_f1": 0.09523809523809523,
-            "cut_recall": 0.0,
-            "hold_recall": 1.0,
+            "accuracy": 0.5,
+            "macro_f1": 0.3238095238095238,
+            "cut_recall": 0.5,
+            "hold_recall": 0.5,
             "hike_recall": 0.0
           }
         },
         {
           "fold": 3,
-          "train_samples": 38,
+          "train_samples": 39,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.0,
@@ -104,99 +104,99 @@
         },
         {
           "fold": 4,
-          "train_samples": 44,
+          "train_samples": 45,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.6666666666666666,
-            "macro_f1": 0.4444444444444444,
+            "macro_f1": 0.4166666666666667,
             "cut_recall": 0.0,
-            "hold_recall": 0.5,
+            "hold_recall": 0.3333333333333333,
             "hike_recall": 1.0
           }
         }
       ],
       "latest_probabilities": {
-        "인하": 0.05649553496904975,
-        "동결": 0.5497477850366325,
-        "인상": 0.39375667999431746
+        "인하": 0.03798216073725819,
+        "동결": 0.6133367766525124,
+        "인상": 0.3486810626102293
       },
       "top_features": [
         {
           "feature": "bond_policy_spread",
-          "importance": 0.16277
-        },
-        {
-          "feature": "korea_us_rate_spread",
-          "importance": 0.124268
+          "importance": 0.167032
         },
         {
           "feature": "bond_3y_change_6m",
-          "importance": 0.110664
+          "importance": 0.10421
+        },
+        {
+          "feature": "korea_us_rate_spread",
+          "importance": 0.101554
         },
         {
           "feature": "inflation",
-          "importance": 0.098022
+          "importance": 0.0891
         },
         {
           "feature": "us_policy_rate",
-          "importance": 0.094301
+          "importance": 0.088353
         },
         {
           "feature": "inflation_change_6m",
-          "importance": 0.084857
+          "importance": 0.077126
         },
         {
           "feature": "rate_change_3m",
-          "importance": 0.083261
+          "importance": 0.063891
         },
         {
-          "feature": "rate_direction_3m",
-          "importance": 0.061293
+          "feature": "bond_3y",
+          "importance": 0.046442
         }
       ]
     },
     "xgboost": {
       "best_params": {
         "max_depth": 1,
-        "learning_rate": 0.03,
-        "min_child_weight": 2,
-        "use_balanced_weights": true
+        "learning_rate": 0.08,
+        "min_child_weight": 5,
+        "use_balanced_weights": false
       },
       "cv_metrics": {
-        "accuracy": 0.25,
-        "macro_f1": 0.24820261437908497,
-        "cut_recall": 0.3,
-        "hold_recall": 0.08333333333333333,
+        "accuracy": 0.20833333333333334,
+        "macro_f1": 0.24531024531024528,
+        "cut_recall": 0.0,
+        "hold_recall": 0.18181818181818182,
         "hike_recall": 1.0
       },
       "folds": [
         {
           "fold": 1,
-          "train_samples": 26,
+          "train_samples": 27,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.16666666666666666,
-            "macro_f1": 0.13333333333333333,
+            "accuracy": 0.0,
+            "macro_f1": 0.0,
+            "cut_recall": 0.0,
+            "hold_recall": 0.0,
+            "hike_recall": 0.0
+          }
+        },
+        {
+          "fold": 2,
+          "train_samples": 33,
+          "test_samples": 6,
+          "metrics": {
+            "accuracy": 0.3333333333333333,
+            "macro_f1": 0.2222222222222222,
             "cut_recall": 0.0,
             "hold_recall": 1.0,
             "hike_recall": 0.0
           }
         },
         {
-          "fold": 2,
-          "train_samples": 32,
-          "test_samples": 6,
-          "metrics": {
-            "accuracy": 0.5,
-            "macro_f1": 0.25,
-            "cut_recall": 0.6,
-            "hold_recall": 0.0,
-            "hike_recall": 0.0
-          }
-        },
-        {
           "fold": 3,
-          "train_samples": 38,
+          "train_samples": 39,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.0,
@@ -208,11 +208,11 @@
         },
         {
           "fold": 4,
-          "train_samples": 44,
+          "train_samples": 45,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.3333333333333333,
-            "macro_f1": 0.16666666666666666,
+            "accuracy": 0.5,
+            "macro_f1": 0.2222222222222222,
             "cut_recall": 0.0,
             "hold_recall": 0.0,
             "hike_recall": 1.0
@@ -220,52 +220,52 @@
         }
       ],
       "latest_probabilities": {
-        "인하": 0.015436655841767788,
-        "동결": 0.24906954169273376,
-        "인상": 0.7354938387870789
+        "인하": 0.026942070573568344,
+        "동결": 0.4753273129463196,
+        "인상": 0.4977305829524994
       },
       "top_features": [
         {
+          "feature": "bond_3y_change_6m",
+          "importance": 0.141166
+        },
+        {
           "feature": "bond_policy_spread",
-          "importance": 0.109719
-        },
-        {
-          "feature": "korea_us_rate_spread",
-          "importance": 0.105059
-        },
-        {
-          "feature": "inflation_change_6m",
-          "importance": 0.086987
-        },
-        {
-          "feature": "inflation",
-          "importance": 0.085632
+          "importance": 0.139161
         },
         {
           "feature": "us_policy_rate",
-          "importance": 0.077511
+          "importance": 0.129243
         },
         {
-          "feature": "rate_direction_3m",
-          "importance": 0.074906
+          "feature": "korea_us_rate_spread",
+          "importance": 0.100483
         },
         {
-          "feature": "bond_3y_change_6m",
-          "importance": 0.073733
+          "feature": "inflation_change_6m",
+          "importance": 0.089603
+        },
+        {
+          "feature": "inflation",
+          "importance": 0.083279
+        },
+        {
+          "feature": "bond_3y_change_3m",
+          "importance": 0.052469
         },
         {
           "feature": "current_rate",
-          "importance": 0.073454
+          "importance": 0.045422
         }
       ]
     }
   },
   "latest_ensemble": {
-    "direction": "인상",
+    "direction": "동결",
     "probabilities": {
-      "인하": 0.035966095405408766,
-      "동결": 0.3994086633646831,
-      "인상": 0.5646252593906982
+      "인하": 0.032462115655413265,
+      "동결": 0.544332044799416,
+      "인상": 0.4232058227813643
     }
   },
   "warnings": [
