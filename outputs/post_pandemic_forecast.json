@@ -3,7 +3,7 @@
     "definition": "post-pandemic",
     "start": "2022-01",
     "training_end": "2026-06",
-    "latest_input": "2026-10-26",
+    "latest_input": "2026-10-27",
     "training_samples": 54
   },
   "target": "Korea policy-rate direction three months ahead",
@@ -52,17 +52,17 @@
       "logistic_regression": {
         "direction": "동결",
         "probabilities": {
-          "인하": 0.012505,
-          "동결": 0.603758,
-          "인상": 0.383737
+          "인하": 0.012592,
+          "동결": 0.607575,
+          "인상": 0.379833
         }
       },
       "random_forest": {
         "direction": "인상",
         "probabilities": {
-          "인하": 0.060961,
-          "동결": 0.447129,
-          "인상": 0.49191
+          "인하": 0.060648,
+          "동결": 0.445775,
+          "인상": 0.493577
         }
       },
       "xgboost": {
@@ -77,9 +77,9 @@
     "equal_weight_ml_ensemble": {
       "direction": "인상",
       "probabilities": {
-        "인하": 0.043383,
-        "동결": 0.459809,
-        "인상": 0.496808
+        "인하": 0.043308,
+        "동결": 0.460631,
+        "인상": 0.496062
       }
     }
   },
