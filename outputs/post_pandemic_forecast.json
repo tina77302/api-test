@@ -2,13 +2,13 @@
   "analysis_period": {
     "definition": "post-pandemic",
     "start": "2022-01",
-    "training_end": "2026-06",
-    "latest_input": "2026-11-18",
-    "training_samples": 54
+    "training_end": "2026-07",
+    "latest_input": "2026-11-19",
+    "training_samples": 55
   },
   "target": "Korea policy-rate direction three months ahead",
   "label_distribution": {
-    "인상": 15,
+    "인상": 16,
     "동결": 29,
     "인하": 10
   },
@@ -17,32 +17,32 @@
     "test_label_distribution": {
       "인하": 6,
       "동결": 11,
-      "인상": 3
+      "인상": 4
     },
     "results": {
       "hold_baseline": {
-        "samples": 20,
-        "accuracy": 0.55,
+        "samples": 21,
+        "accuracy": 0.52381,
         "balanced_accuracy": 0.333333,
-        "macro_f1": 0.236559
+        "macro_f1": 0.229167
       },
       "logistic_regression": {
-        "samples": 20,
-        "accuracy": 0.35,
+        "samples": 21,
+        "accuracy": 0.333333,
         "balanced_accuracy": 0.363636,
-        "macro_f1": 0.234921
+        "macro_f1": 0.232143
       },
       "random_forest": {
-        "samples": 20,
-        "accuracy": 0.15,
+        "samples": 21,
+        "accuracy": 0.142857,
         "balanced_accuracy": 0.166667,
         "macro_f1": 0.133333
       },
       "xgboost": {
-        "samples": 20,
-        "accuracy": 0.35,
+        "samples": 21,
+        "accuracy": 0.333333,
         "balanced_accuracy": 0.363636,
-        "macro_f1": 0.279739
+        "macro_f1": 0.276961
       }
     }
   },
@@ -52,34 +52,34 @@
       "logistic_regression": {
         "direction": "동결",
         "probabilities": {
-          "인하": 0.024945,
-          "동결": 0.661939,
-          "인상": 0.313115
+          "인하": 0.027301,
+          "동결": 0.588044,
+          "인상": 0.384656
         }
       },
       "random_forest": {
         "direction": "인상",
         "probabilities": {
-          "인하": 0.060961,
-          "동결": 0.452581,
-          "인상": 0.486458
+          "인하": 0.048801,
+          "동결": 0.434777,
+          "인상": 0.516422
         }
       },
       "xgboost": {
         "direction": "인상",
         "probabilities": {
-          "인하": 0.057072,
-          "동결": 0.341989,
-          "인상": 0.600939
+          "인하": 0.04385,
+          "동결": 0.289147,
+          "인상": 0.667002
         }
       }
     },
     "equal_weight_ml_ensemble": {
-      "direction": "동결",
+      "direction": "인상",
       "probabilities": {
-        "인하": 0.047659,
-        "동결": 0.485503,
-        "인상": 0.466838
+        "인하": 0.039984,
+        "동결": 0.437323,
+        "인상": 0.522693
       }
     }
   },

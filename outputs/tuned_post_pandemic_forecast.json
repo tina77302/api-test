@@ -1,9 +1,9 @@
 {
   "analysis_period": {
     "start": "2022-01",
-    "training_end": "2026-06",
-    "latest_input": "2026-11-18",
-    "training_samples": 54
+    "training_end": "2026-07",
+    "latest_input": "2026-11-19",
+    "training_samples": 55
   },
   "features": [
     "current_rate",
@@ -27,7 +27,7 @@
     "rate_direction_3m"
   ],
   "label_distribution": {
-    "인상": 15,
+    "인상": 16,
     "동결": 29,
     "인하": 10
   },
@@ -38,9 +38,9 @@
     "gap_months": 3,
     "selection_metric": "macro_f1",
     "test_label_distribution": {
-      "인하": 10,
+      "인하": 9,
       "동결": 11,
-      "인상": 3
+      "인상": 4
     },
     "hold_baseline_metrics": {
       "accuracy": 0.4583333333333333,
@@ -56,19 +56,19 @@
         "max_depth": 4,
         "min_samples_leaf": 2,
         "max_features": "sqrt",
-        "class_weight": null
+        "class_weight": "balanced"
       },
       "cv_metrics": {
-        "accuracy": 0.2916666666666667,
-        "macro_f1": 0.3836675020885547,
-        "cut_recall": 0.2,
+        "accuracy": 0.3333333333333333,
+        "macro_f1": 0.39415204678362575,
+        "cut_recall": 0.3333333333333333,
         "hold_recall": 0.18181818181818182,
-        "hike_recall": 1.0
+        "hike_recall": 0.75
       },
       "folds": [
         {
           "fold": 1,
-          "train_samples": 27,
+          "train_samples": 28,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.0,
@@ -80,19 +80,19 @@
         },
         {
           "fold": 2,
-          "train_samples": 33,
+          "train_samples": 34,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.5,
-            "macro_f1": 0.3238095238095238,
-            "cut_recall": 0.5,
-            "hold_recall": 0.5,
+            "accuracy": 0.8333333333333334,
+            "macro_f1": 0.5523809523809523,
+            "cut_recall": 1.0,
+            "hold_recall": 0.6666666666666666,
             "hike_recall": 0.0
           }
         },
         {
           "fold": 3,
-          "train_samples": 39,
+          "train_samples": 40,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.0,
@@ -104,75 +104,75 @@
         },
         {
           "fold": 4,
-          "train_samples": 45,
+          "train_samples": 46,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.6666666666666666,
-            "macro_f1": 0.4166666666666667,
+            "accuracy": 0.5,
+            "macro_f1": 0.2222222222222222,
             "cut_recall": 0.0,
-            "hold_recall": 0.3333333333333333,
-            "hike_recall": 1.0
+            "hold_recall": 0.0,
+            "hike_recall": 0.75
           }
         }
       ],
       "latest_probabilities": {
-        "인하": 0.03953690149458516,
-        "동결": 0.6364746765878261,
-        "인상": 0.3239884219175886
+        "인하": 0.051391107187159814,
+        "동결": 0.5030612737652213,
+        "인상": 0.445547619047619
       },
       "top_features": [
         {
           "feature": "bond_policy_spread",
-          "importance": 0.167032
+          "importance": 0.171622
         },
         {
           "feature": "bond_3y_change_6m",
-          "importance": 0.10421
-        },
-        {
-          "feature": "korea_us_rate_spread",
-          "importance": 0.101554
+          "importance": 0.121531
         },
         {
           "feature": "inflation",
-          "importance": 0.0891
+          "importance": 0.111061
+        },
+        {
+          "feature": "korea_us_rate_spread",
+          "importance": 0.09224
         },
         {
           "feature": "us_policy_rate",
-          "importance": 0.088353
-        },
-        {
-          "feature": "inflation_change_6m",
-          "importance": 0.077126
-        },
-        {
-          "feature": "rate_change_3m",
-          "importance": 0.063891
+          "importance": 0.089335
         },
         {
           "feature": "bond_3y",
-          "importance": 0.046442
+          "importance": 0.076498
+        },
+        {
+          "feature": "bond_3y_change_3m",
+          "importance": 0.067524
+        },
+        {
+          "feature": "inflation_change_6m",
+          "importance": 0.048682
         }
       ]
     },
     "xgboost": {
       "best_params": {
         "max_depth": 1,
-        "learning_rate": 0.08,
-        "min_child_weight": 5,
+        "learning_rate": 0.03,
+        "min_child_weight": 2,
         "use_balanced_weights": false
       },
       "cv_metrics": {
-        "accuracy": 0.20833333333333334,
-        "macro_f1": 0.24531024531024528,
-        "cut_recall": 0.0,
-        "hold_recall": 0.18181818181818182,
+        "accuracy": 0.2916666666666667,
+        "macro_f1": 0.2657952069716776,
+        "cut_recall": 0.3333333333333333,
+        "hold_recall": 0.0,
         "hike_recall": 1.0
       },
       "folds": [
         {
           "fold": 1,
-          "train_samples": 27,
+          "train_samples": 28,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.0,
@@ -184,19 +184,19 @@
         },
         {
           "fold": 2,
-          "train_samples": 33,
+          "train_samples": 34,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.3333333333333333,
+            "accuracy": 0.5,
             "macro_f1": 0.2222222222222222,
-            "cut_recall": 0.0,
-            "hold_recall": 1.0,
+            "cut_recall": 1.0,
+            "hold_recall": 0.0,
             "hike_recall": 0.0
           }
         },
         {
           "fold": 3,
-          "train_samples": 39,
+          "train_samples": 40,
           "test_samples": 6,
           "metrics": {
             "accuracy": 0.0,
@@ -208,11 +208,11 @@
         },
         {
           "fold": 4,
-          "train_samples": 45,
+          "train_samples": 46,
           "test_samples": 6,
           "metrics": {
-            "accuracy": 0.5,
-            "macro_f1": 0.2222222222222222,
+            "accuracy": 0.6666666666666666,
+            "macro_f1": 0.26666666666666666,
             "cut_recall": 0.0,
             "hold_recall": 0.0,
             "hike_recall": 1.0
@@ -220,52 +220,52 @@
         }
       ],
       "latest_probabilities": {
-        "인하": 0.02837320789694786,
-        "동결": 0.5792391896247864,
-        "인상": 0.39238759875297546
+        "인하": 0.024102039635181427,
+        "동결": 0.3788824677467346,
+        "인상": 0.5970154404640198
       },
       "top_features": [
         {
-          "feature": "bond_3y_change_6m",
-          "importance": 0.141166
-        },
-        {
-          "feature": "bond_policy_spread",
-          "importance": 0.139161
+          "feature": "inflation_change_6m",
+          "importance": 0.144469
         },
         {
           "feature": "us_policy_rate",
-          "importance": 0.129243
+          "importance": 0.104124
+        },
+        {
+          "feature": "bond_policy_spread",
+          "importance": 0.094954
         },
         {
           "feature": "korea_us_rate_spread",
-          "importance": 0.100483
+          "importance": 0.084701
         },
         {
-          "feature": "inflation_change_6m",
-          "importance": 0.089603
+          "feature": "rate_change_3m",
+          "importance": 0.072814
+        },
+        {
+          "feature": "bond_3y_change_6m",
+          "importance": 0.066588
         },
         {
           "feature": "inflation",
-          "importance": 0.083279
+          "importance": 0.061932
         },
         {
-          "feature": "bond_3y_change_3m",
-          "importance": 0.052469
-        },
-        {
-          "feature": "current_rate",
-          "importance": 0.045422
+          "feature": "rate_direction_3m",
+          "importance": 0.061875
         }
       ]
     }
   },
   "latest_ensemble": {
-    "direction": "동결",
+    "direction": "인상",
     "probabilities": {
-      "인하": 0.03395505469576651,
-      "동결": 0.6078569331063062,
-      "인상": 0.358188010335282
+      "인하": 0.03774657341117062,
+      "동결": 0.44097187075597793,
+      "인상": 0.5212815297558194
     }
   },
   "warnings": [
