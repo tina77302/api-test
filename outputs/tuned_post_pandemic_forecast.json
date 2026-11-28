@@ -2,7 +2,7 @@
   "analysis_period": {
     "start": "2022-01",
     "training_end": "2026-07",
-    "latest_input": "2026-11-27",
+    "latest_input": "2026-11-28",
     "training_samples": 55
   },
   "features": [
@@ -117,7 +117,7 @@
       ],
       "latest_probabilities": {
         "인하": 0.04419203311308574,
-        "동결": 0.5004825700615174,
+        "동결": 0.5004825700615173,
         "인상": 0.4553253968253968
       },
       "top_features": [
